@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-13 19:03 by Victor N. Skurikhin.
  * trace.go
  * $Id$
  */
@@ -10,12 +10,20 @@ import (
 	"context"
 	"fmt"
 	uuid4 "github.com/google/uuid"
-	"log"
+	"github.com/vskurikhin/gophermart/internal/logger"
+	"go.uber.org/zap"
 	"time"
 )
 
-func Trace(ctx context.Context, name, format string, values ...any) func() {
+func TraceInOut(ctx context.Context, name, format string, values ...any) func() {
 
+	l := logger.Get()
+
+	if l.Level() != zap.DebugLevel {
+		return func() {
+
+		}
+	}
 	var uuid uuid4.UUID
 
 	if value := ctx.Value("uuid"); value != nil {
@@ -30,9 +38,9 @@ func Trace(ctx context.Context, name, format string, values ...any) func() {
 	start := time.Now()
 
 	f := fmt.Sprintf(" in[%s]: %s(", uuid, name) + format + ")"
-	log.Printf(f, values...)
+	l.Debug(fmt.Sprintf(f, values...))
 
 	return func() {
-		log.Printf("out[%s]: %s [%s]", uuid, name, time.Since(start))
+		l.Debug(fmt.Sprintf("out[%s]: %s [%s]", uuid, name, time.Since(start)))
 	}
 }

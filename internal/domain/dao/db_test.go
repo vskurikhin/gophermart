@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-13 18:27 by Victor N. Skurikhin.
  * db_test.go
  * $Id$
  */
@@ -8,7 +8,6 @@ package dao
 
 import (
 	"context"
-	"fmt"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -17,7 +16,6 @@ import (
 	"github.com/vskurikhin/gophermart/internal/storage"
 	"log"
 	"math/big"
-	"os"
 	"testing"
 )
 
@@ -99,10 +97,8 @@ func TestDaoSaveGet(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			test1, err := test.save()
-			fmt.Fprintf(os.Stderr, "test1: %v\n", test1)
 			assert.Nil(t, err)
 			test2, err := test.get()
-			fmt.Fprintf(os.Stderr, "test2: %v\n", test2)
 			assert.Nil(t, err)
 			assert.Equal(t, test1, test2)
 		})

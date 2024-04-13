@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:19 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-13 19:04 by Victor N. Skurikhin.
  * config_test.go
  * $Id$
  */

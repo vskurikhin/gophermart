@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-13 18:28 by Victor N. Skurikhin.
  * flags.go
  * $Id$
  */
@@ -13,6 +13,7 @@ type flags struct {
 	address              *string
 	dataBaseDSN          *string
 	key                  *string
+	developmentLogger    *bool
 }
 
 func newFlags() *flags {
@@ -41,6 +42,12 @@ func newFlags() *flags {
 		"",
 		"help message for key",
 	)
+	f.developmentLogger = pflag.BoolP(
+		"development-logger",
+		"z",
+		true,
+		"help message for development logger",
+	)
 	pflag.Parse()
 
 	return f
@@ -60,4 +67,8 @@ func (f *flags) DataBaseDSN() *string {
 
 func (f *flags) Key() *string {
 	return f.key
+}
+
+func (f *flags) DevelopmentLogger() *bool {
+	return f.developmentLogger
 }
