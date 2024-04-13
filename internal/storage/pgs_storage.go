@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-12 14:04 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
  * pgs_storage.go
  * $Id$
  */
@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/vskurikhin/gophermart/internal/util"
+	"github.com/vskurikhin/gophermart/internal/utils"
 	"log"
 	"time"
 )
@@ -38,31 +38,31 @@ func (p *PgsStorage) WithContext(ctx context.Context) Storage {
 
 func (p *PgsStorage) GetAll(sql string) (pgx.Rows, error) {
 	const funcName = "PgsStorage.GetAll"
-	defer util.Trace(p.ctx, funcName, "%s", sql)()
+	defer utils.Trace(p.ctx, funcName, "%s", sql)()
 	return nil, errors.New("not implemented")
 }
 
 func (p *PgsStorage) GetById(sql string, id int) (pgx.Row, error) {
 	const funcName = "PgsStorage.GetById"
-	defer util.Trace(p.ctx, funcName, "%s, %d", sql, id)()
+	defer utils.Trace(p.ctx, funcName, "%s, %d", sql, id)()
 	return p.sqlRow(funcName, sql, id)
 }
 
 func (p *PgsStorage) GetByLogin(sql, login string) (pgx.Row, error) {
 	const funcName = "PgsStorage.GetByLogin"
-	defer util.Trace(p.ctx, funcName, "%s, %s", sql, login)()
+	defer utils.Trace(p.ctx, funcName, "%s, %s", sql, login)()
 	return p.sqlRow(funcName, sql, login)
 }
 
 func (p *PgsStorage) GetByLoginNumber(sql, login, number string) (pgx.Row, error) {
 	const funcName = "PgsStorage.GetByLoginNumber"
-	defer util.Trace(p.ctx, funcName, "%s, %s, %s", sql, login, number)()
+	defer utils.Trace(p.ctx, funcName, "%s, %s, %s", sql, login, number)()
 	return p.sqlRow(funcName, sql, login, number)
 }
 
 func (p *PgsStorage) Save(sql string, values ...any) (pgx.Row, error) {
 	const funcName = "PgsStorage.Save"
-	defer util.Trace(p.ctx, funcName, "%s, %s", sql, values)()
+	defer utils.Trace(p.ctx, funcName, "%s, %s", sql, values)()
 	return p.sqlRow(funcName, sql, values...)
 }
 

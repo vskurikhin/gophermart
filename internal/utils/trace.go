@@ -1,10 +1,10 @@
 /*
- * This file was last modified at 2024-04-12 14:53 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
  * trace.go
  * $Id$
  */
 
-package util
+package utils
 
 import (
 	"context"
