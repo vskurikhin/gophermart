@@ -1,3 +1,9 @@
+/*
+ * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * db_test.go
+ * $Id$
+ */
+
 package dao
 
 import (
@@ -75,16 +81,16 @@ func TestDaoSaveGet(t *testing.T) {
 			},
 		},
 		{
-			name: "Test #4 Withdraw",
+			name: "Test #4 Withdraws",
 			save: func() (interface{}, error) {
 				store = store.WithContext(newUUIDContext())
-				repo0 := Withdraw(store)
+				repo0 := Withdraws(store)
 				test0 := entity.NewWithdraw("test1", "test1", *new(big.Float), 1)
 				return repo0.Save(test0)
 			},
 			get: func() (interface{}, error) {
 				store = store.WithContext(newUUIDContext())
-				repo0 := Withdraw(store)
+				repo0 := Withdraws(store)
 				return repo0.GetWithdraw("test1", "test1")
 			},
 		},
