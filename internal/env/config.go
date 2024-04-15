@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 19:08 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 11:23 by Victor N. Skurikhin.
  * config.go
  * $Id$
  */
@@ -11,7 +11,14 @@ import (
 	"sync"
 )
 
-type Config struct {
+type Config interface {
+	AccrualSystemAddress() string
+	Address() string
+	DataBaseDSN() string
+	Key() string
+}
+
+type config struct {
 	accrualSystemAddress string
 	address              string
 	dataBaseDSN          string
@@ -19,56 +26,56 @@ type Config struct {
 }
 
 var once = new(sync.Once)
-var config *Config
+var cfg *config
 
-func GetConfig() *Config {
+func GetConfig() Config {
 
 	once.Do(func() {
-		config = new(Config)
+		cfg = new(config)
 		e := newEnvironments()
 		f := newFlags()
 
 		if e.AccrualSystemAddress() != "" {
-			config.accrualSystemAddress = e.AccrualSystemAddress()
+			cfg.accrualSystemAddress = e.AccrualSystemAddress()
 		} else {
-			config.accrualSystemAddress = *f.AccrualSystemAddress()
+			cfg.accrualSystemAddress = *f.AccrualSystemAddress()
 		}
 
 		if e.Address() != "" {
-			config.address = e.Address()
+			cfg.address = e.Address()
 		} else {
-			config.address = *f.Address()
+			cfg.address = *f.Address()
 		}
 
 		if e.DataBaseDSN() != "" {
-			config.dataBaseDSN = e.DataBaseDSN()
+			cfg.dataBaseDSN = e.DataBaseDSN()
 		} else {
-			config.dataBaseDSN = *f.DataBaseDSN()
+			cfg.dataBaseDSN = *f.DataBaseDSN()
 		}
 
 		if e.Key() != "" {
-			config.key = e.Key()
+			cfg.key = e.Key()
 		} else {
-			config.key = *f.Key()
+			cfg.key = *f.Key()
 		}
 		logger.Development = *f.DevelopmentLogger()
 	})
 
-	return config
+	return cfg
 }
 
-func (c *Config) AccrualSystemAddress() string {
+func (c *config) AccrualSystemAddress() string {
 	return c.accrualSystemAddress
 }
 
-func (c *Config) Address() string {
+func (c *config) Address() string {
 	return c.address
 }
 
-func (c *Config) DataBaseDSN() string {
+func (c *config) DataBaseDSN() string {
 	return c.dataBaseDSN
 }
 
-func (c *Config) Key() string {
+func (c *config) Key() string {
 	return c.key
 }

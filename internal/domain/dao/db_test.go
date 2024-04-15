@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 18:27 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 11:32 by Victor N. Skurikhin.
  * db_test.go
  * $Id$
  */
@@ -13,6 +13,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/stretchr/testify/assert"
 	"github.com/vskurikhin/gophermart/internal/domain/entity"
+	"github.com/vskurikhin/gophermart/internal/env"
 	"github.com/vskurikhin/gophermart/internal/storage"
 	"log"
 	"math/big"
@@ -146,7 +147,7 @@ func dbConnect() {
 		return
 	}
 
-	cfg, err := pgxpool.ParseConfig("postgresql://postgres:postgres@localhost/praktikum?sslmode=disable")
+	cfg, err := pgxpool.ParseConfig(env.DefaultConnDatabaseDSN)
 	if err != nil {
 		log.Fatalf("dbConnect error: %v\n", err)
 	}
