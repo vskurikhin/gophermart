@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 12:13 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 16:51 by Victor N. Skurikhin.
  * pgs_test.go
  * $Id$
  */
@@ -14,10 +14,8 @@ import (
 //goland:noinspection GoImportUsedAsName,GoUnhandledErrorResult
 func TestPgsStoragePositive(t *testing.T) {
 
-	dbPool := DBPool()
-	pgxPool, ok := dbPool.DBPool()
-	assert.True(t, ok)
-	storage := NewPgsStorage(pgxPool)
+	storage := NewPgsStorage()
+	assert.NotNil(t, storage)
 
 	var tests = []struct {
 		name string

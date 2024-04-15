@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 15:10 by Victor N. Skurikhin.
  * user.go
  * $Id$
  */
@@ -44,11 +44,24 @@ func (u *User) UpdateAt() *time.Time {
 	return u.updateAt
 }
 
+func (u *User) Insert(s storage.Storage) (*User, error) {
+	row, err := s.Save(
+		`INSERT INTO "user" (login, password, created_at)
+             VALUES ($1, $2, now())
+             RETURNING *`,
+		u.login, u.password,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return extractUser(row)
+}
+
 func (u *User) Save(s storage.Storage) (*User, error) {
 
 	row, err := s.Save(
-		`INSERT INTO "user"
-				    (login, password, created_at)
+		`INSERT INTO "user" (login, password, created_at)
              VALUES ($1, $2, now())
              ON CONFLICT (login)
              DO UPDATE SET
@@ -60,18 +73,7 @@ func (u *User) Save(s storage.Storage) (*User, error) {
 		return nil, err
 	}
 
-	pLogin, pPassword, pCreatedAt, pUpdateAt, err := extractUser(row)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &User{
-		login:     *pLogin,
-		password:  pPassword,
-		createdAt: *pCreatedAt,
-		updateAt:  pUpdateAt,
-	}, nil
+	return extractUser(row)
 }
 
 func FuncGetAllUsers() func(storage.Storage) ([]*User, error) {
@@ -92,7 +94,7 @@ func FuncGetUser() func(storage.Storage, string) (*User, error) {
 			return nil, err
 		}
 
-		pLogin, pPassword, pCreatedAt, pUpdateAt, err := extractUser(row)
+		pLogin, pPassword, pCreatedAt, pUpdateAt, err := extractUserTuple(row)
 
 		if err != nil {
 			return nil, err
@@ -107,7 +109,22 @@ func FuncGetUser() func(storage.Storage, string) (*User, error) {
 	}
 }
 
-func extractUser(row pgx.Row) (*string, *string, *time.Time, *time.Time, error) {
+func extractUser(row pgx.Row) (*User, error) {
+	pLogin, pPassword, pCreatedAt, pUpdateAt, err := extractUserTuple(row)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &User{
+		login:     *pLogin,
+		password:  pPassword,
+		createdAt: *pCreatedAt,
+		updateAt:  pUpdateAt,
+	}, nil
+}
+
+func extractUserTuple(row pgx.Row) (*string, *string, *time.Time, *time.Time, error) {
 
 	var login string
 	var password *string

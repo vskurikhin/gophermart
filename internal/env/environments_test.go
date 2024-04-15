@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 22:15 by Victor N. Skurikhin.
  * environments_test.go
  * $Id$
  */
@@ -23,22 +23,22 @@ func TestEnvironments(t *testing.T) {
 		{
 			name: "Test environments positive #1",
 			input: environments{
-				accrualSystemAddress: []string{},
-				address:              []string{"localhost", "8080"},
+				AccrualSystemAddress: []string{},
+				Address:              []string{"localhost", "8080"},
 			},
 			dontWant: "dontWant",
 		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got := test.input.AccrualSystemAddress()
+			got := test.input.accrualSystemAddress()
 			assert.Equal(t, "", got)
-			got = test.input.Address()
+			got = test.input.address()
 			assert.Equal(t, urlHost, got)
 			e := newEnvironments()
-			got = e.DataBaseDSN()
+			got = e.DataBaseDSN
 			assert.NotEqual(t, test.dontWant, got)
-			got = e.Key()
+			got = e.Key
 			assert.NotEqual(t, test.dontWant, got)
 		})
 	}

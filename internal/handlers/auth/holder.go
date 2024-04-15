@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 10:39 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 14:48 by Victor N. Skurikhin.
  * holder.go
  * $Id$
  */
@@ -8,12 +8,18 @@ package auth
 
 import (
 	"github.com/vskurikhin/gophermart/internal/handlers"
+	"github.com/vskurikhin/gophermart/internal/logger"
+	"github.com/vskurikhin/gophermart/internal/storage"
+	"net/http"
 	"sync"
 )
 
-type Holder interface {
-	HandlerLogin() handlers.Handler
-	HandlerRegister() handlers.Handler
+func UserLoginHandlerFunc() http.HandlerFunc {
+	return http.HandlerFunc(getInstance().login.Handle)
+}
+
+func UserRegisterHandlerFunc() http.HandlerFunc {
+	return http.HandlerFunc(getInstance().register.Handle)
 }
 
 type holder struct {
@@ -22,23 +28,15 @@ type holder struct {
 }
 
 var once = new(sync.Once)
-var instance Holder
+var instance *holder
 
-func GetInstance() Holder {
+func getInstance() *holder {
 
 	once.Do(func() {
 		h := new(holder)
-		h.login = newLogin()
-		h.register = newRegister()
+		h.login = newLogin(logger.Get(), storage.NewPgsStorage())
+		h.register = newRegister(logger.Get(), storage.NewPgsStorage())
 		instance = h
 	})
 	return instance
-}
-
-func (h *holder) HandlerLogin() handlers.Handler {
-	return h.login
-}
-
-func (h *holder) HandlerRegister() handlers.Handler {
-	return h.register
 }

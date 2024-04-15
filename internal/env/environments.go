@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 22:15 by Victor N. Skurikhin.
  * environments.go
  * $Id$
  */
@@ -13,10 +13,10 @@ import (
 )
 
 type environments struct {
-	accrualSystemAddress []string `env:"ACCRUAL_SYSTEM_ADDRESS" envSeparator:":"`
-	address              []string `env:"RUN_ADDRESS" envSeparator:":"`
-	dataBaseDSN          string   `env:"DATABASE_DSN"`
-	key                  string   `env:"KEY"`
+	AccrualSystemAddress []string `env:"ACCRUAL_SYSTEM_ADDRESS" envSeparator:":"`
+	Address              []string `env:"RUN_ADDRESS" envSeparator:":"`
+	DataBaseDSN          string   `env:"DATABASE_URI"`
+	Key                  string   `env:"KEY"`
 }
 
 func newEnvironments() *environments {
@@ -29,20 +29,12 @@ func newEnvironments() *environments {
 	return e
 }
 
-func (e *environments) AccrualSystemAddress() string {
-	return parseAddress(e.accrualSystemAddress)
+func (e *environments) accrualSystemAddress() string {
+	return parseAddress(e.AccrualSystemAddress)
 }
 
-func (e *environments) Address() string {
-	return parseAddress(e.address)
-}
-
-func (e *environments) DataBaseDSN() string {
-	return e.dataBaseDSN
-}
-
-func (e *environments) Key() string {
-	return e.key
+func (e *environments) address() string {
+	return parseAddress(e.Address)
 }
 
 func parseAddress(address []string) string {

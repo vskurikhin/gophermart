@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 11:23 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 22:15 by Victor N. Skurikhin.
  * config.go
  * $Id$
  */
@@ -35,26 +35,26 @@ func GetConfig() Config {
 		e := newEnvironments()
 		f := newFlags()
 
-		if e.AccrualSystemAddress() != "" {
-			cfg.accrualSystemAddress = e.AccrualSystemAddress()
+		if e.accrualSystemAddress() != "" {
+			cfg.accrualSystemAddress = e.accrualSystemAddress()
 		} else {
 			cfg.accrualSystemAddress = *f.AccrualSystemAddress()
 		}
 
-		if e.Address() != "" {
-			cfg.address = e.Address()
+		if e.address() != "" {
+			cfg.address = e.address()
 		} else {
 			cfg.address = *f.Address()
 		}
 
-		if e.DataBaseDSN() != "" {
-			cfg.dataBaseDSN = e.DataBaseDSN()
+		if e.DataBaseDSN != "" {
+			cfg.dataBaseDSN = e.DataBaseDSN
 		} else {
 			cfg.dataBaseDSN = *f.DataBaseDSN()
 		}
 
-		if e.Key() != "" {
-			cfg.key = e.Key()
+		if e.Key != "" {
+			cfg.key = e.Key
 		} else {
 			cfg.key = *f.Key()
 		}

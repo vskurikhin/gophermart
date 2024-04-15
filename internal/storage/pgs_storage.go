@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 10:39 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 16:57 by Victor N. Skurikhin.
  * pgs_storage.go
  * $Id$
  */
@@ -30,12 +30,15 @@ type PgsStorage struct {
 	pool *pgxpool.Pool
 }
 
-func NewPgsStorage(pool *pgxpool.Pool) *PgsStorage {
-	return &PgsStorage{ctx: context.Background(), pool: pool, log: logger.Get()}
+func NewPgsStorage() *PgsStorage {
+	if pool, ok := GetDB().DBPool(); ok {
+		return &PgsStorage{ctx: context.Background(), log: logger.Get(), pool: pool}
+	}
+	panic(fmt.Errorf("can't create DB pool"))
 }
 
 func (p *PgsStorage) WithContext(ctx context.Context) Storage {
-	return &PgsStorage{ctx: ctx, pool: p.pool, log: p.log}
+	return &PgsStorage{ctx: ctx, log: p.log, pool: p.pool}
 }
 
 func (p *PgsStorage) GetAll(sql string) (pgx.Rows, error) {
@@ -44,8 +47,8 @@ func (p *PgsStorage) GetAll(sql string) (pgx.Rows, error) {
 	return nil, errors.New("not implemented")
 }
 
-func (p *PgsStorage) GetById(sql string, id int) (pgx.Row, error) {
-	const funcName = "PgsStorage.GetById"
+func (p *PgsStorage) GetByID(sql string, id int) (pgx.Row, error) {
+	const funcName = "PgsStorage.GetByID"
 	defer utils.TraceInOut(p.ctx, funcName, "%s, %d", sql, id)()
 	return p.sqlRow(funcName, sql, id)
 }
