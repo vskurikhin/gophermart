@@ -1,6 +1,6 @@
 /*
- * This file was last modified at 2024-04-15 14:11 by Victor N. Skurikhin.
- * user_register.go
+ * This file was last modified at 2024-04-16 10:37 by Victor N. Skurikhin.
+ * user.go
  * $Id$
  */
 
@@ -11,14 +11,14 @@ import (
 	"io"
 )
 
-type UserRegister struct {
+type User struct {
 	Login    string `json:"login"`    // логин
 	Password string `json:"password"` // пароль
 }
 
-func UnmarshalFromReader(reader io.Reader) (*UserRegister, error) {
+func UnmarshalFromReader(reader io.Reader) (*User, error) {
 
-	userRegister := new(UserRegister)
+	userRegister := new(User)
 
 	if err := easyjson.UnmarshalFromReader(reader, userRegister); err != nil {
 		return nil, err
@@ -26,7 +26,7 @@ func UnmarshalFromReader(reader io.Reader) (*UserRegister, error) {
 	return userRegister, nil
 }
 
-func (u *UserRegister) MarshalToWriter(writer io.Writer) error {
+func (u *User) MarshalToWriter(writer io.Writer) error {
 
 	if _, err := easyjson.MarshalToWriter(u, writer); err != nil {
 		return err

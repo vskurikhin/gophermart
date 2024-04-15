@@ -1,6 +1,6 @@
 /*
- * This file was last modified at 2024-04-15 13:04 by Victor N. Skurikhin.
- * user_register_easyjson.go
+ * This file was last modified at 2024-04-16 10:38 by Victor N. Skurikhin.
+ * user_easyjson.go
  * $Id$
  */
 
@@ -23,7 +23,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson822f4455DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer.Lexer, out *UserRegister) {
+func easyjson9e1087fdDecodeGithubComVskurikhinGophermartInternalModel(in *jlexer.Lexer, out *User) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -56,7 +56,7 @@ func easyjson822f4455DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer
 		in.Consumed()
 	}
 }
-func easyjson822f4455EncodeGithubComVskurikhinGophermartInternalModel(out *jwriter.Writer, in UserRegister) {
+func easyjson9e1087fdEncodeGithubComVskurikhinGophermartInternalModel(out *jwriter.Writer, in User) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -74,25 +74,25 @@ func easyjson822f4455EncodeGithubComVskurikhinGophermartInternalModel(out *jwrit
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v UserRegister) MarshalJSON() ([]byte, error) {
+func (v User) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson822f4455EncodeGithubComVskurikhinGophermartInternalModel(&w, v)
+	easyjson9e1087fdEncodeGithubComVskurikhinGophermartInternalModel(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v UserRegister) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson822f4455EncodeGithubComVskurikhinGophermartInternalModel(w, v)
+func (v User) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjson9e1087fdEncodeGithubComVskurikhinGophermartInternalModel(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *UserRegister) UnmarshalJSON(data []byte) error {
+func (v *User) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson822f4455DecodeGithubComVskurikhinGophermartInternalModel(&r, v)
+	easyjson9e1087fdDecodeGithubComVskurikhinGophermartInternalModel(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *UserRegister) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson822f4455DecodeGithubComVskurikhinGophermartInternalModel(l, v)
+func (v *User) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjson9e1087fdDecodeGithubComVskurikhinGophermartInternalModel(l, v)
 }

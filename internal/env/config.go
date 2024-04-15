@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 22:15 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-16 09:51 by Victor N. Skurikhin.
  * config.go
  * $Id$
  */
@@ -7,7 +7,6 @@
 package env
 
 import (
-	"github.com/vskurikhin/gophermart/internal/logger"
 	"sync"
 )
 
@@ -15,6 +14,7 @@ type Config interface {
 	AccrualSystemAddress() string
 	Address() string
 	DataBaseDSN() string
+	DevelopmentLogger() bool
 	Key() string
 }
 
@@ -22,6 +22,7 @@ type config struct {
 	accrualSystemAddress string
 	address              string
 	dataBaseDSN          string
+	developmentLogger    bool
 	key                  string
 }
 
@@ -58,7 +59,7 @@ func GetConfig() Config {
 		} else {
 			cfg.key = *f.Key()
 		}
-		logger.Development = *f.DevelopmentLogger()
+		cfg.developmentLogger = f.DevelopmentLogger()
 	})
 
 	return cfg
@@ -74,6 +75,10 @@ func (c *config) Address() string {
 
 func (c *config) DataBaseDSN() string {
 	return c.dataBaseDSN
+}
+
+func (c *config) DevelopmentLogger() bool {
+	return c.developmentLogger
 }
 
 func (c *config) Key() string {

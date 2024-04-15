@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 14:48 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-16 10:37 by Victor N. Skurikhin.
  * holder.go
  * $Id$
  */
@@ -8,8 +8,6 @@ package auth
 
 import (
 	"github.com/vskurikhin/gophermart/internal/handlers"
-	"github.com/vskurikhin/gophermart/internal/logger"
-	"github.com/vskurikhin/gophermart/internal/storage"
 	"net/http"
 	"sync"
 )
@@ -34,8 +32,8 @@ func getInstance() *holder {
 
 	once.Do(func() {
 		h := new(holder)
-		h.login = newLogin(logger.Get(), storage.NewPgsStorage())
-		h.register = newRegister(logger.Get(), storage.NewPgsStorage())
+		h.login = newLogin()
+		h.register = newRegister()
 		instance = h
 	})
 	return instance

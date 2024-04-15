@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 11:32 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-16 09:51 by Victor N. Skurikhin.
  * flags.go
  * $Id$
  */
@@ -14,8 +14,8 @@ type flags struct {
 	accrualSystemAddress *string
 	address              *string
 	dataBaseDSN          *string
-	key                  *string
 	developmentLogger    *bool
+	key                  *string
 }
 
 func newFlags() *flags {
@@ -71,6 +71,6 @@ func (f *flags) Key() *string {
 	return f.key
 }
 
-func (f *flags) DevelopmentLogger() *bool {
-	return f.developmentLogger
+func (f *flags) DevelopmentLogger() bool {
+	return f.developmentLogger != nil && *f.developmentLogger
 }
