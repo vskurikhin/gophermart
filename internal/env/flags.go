@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 18:28 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 11:32 by Victor N. Skurikhin.
  * flags.go
  * $Id$
  */
@@ -7,6 +7,8 @@
 package env
 
 import "github.com/spf13/pflag"
+
+const DefaultConnDatabaseDSN = "postgresql://postgres:postgres@localhost/praktikum?sslmode=disable"
 
 type flags struct {
 	accrualSystemAddress *string
@@ -33,7 +35,7 @@ func newFlags() *flags {
 	f.dataBaseDSN = pflag.StringP(
 		"database-dsn",
 		"d",
-		"postgresql://postgres:postgres@localhost/praktikum?sslmode=disable",
+		DefaultConnDatabaseDSN,
 		"help message for file database DSN",
 	)
 	f.key = pflag.StringP(
