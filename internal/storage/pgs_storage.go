@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 19:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 10:39 by Victor N. Skurikhin.
  * pgs_storage.go
  * $Id$
  */
@@ -10,7 +10,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	uuid4 "github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/vskurikhin/gophermart/internal/logger"
@@ -27,8 +26,8 @@ const (
 
 type PgsStorage struct {
 	ctx  context.Context
-	pool *pgxpool.Pool
 	log  *zap.Logger
+	pool *pgxpool.Pool
 }
 
 func NewPgsStorage(pool *pgxpool.Pool) *PgsStorage {
@@ -73,14 +72,7 @@ func (p *PgsStorage) sqlRow(name, sql string, values ...any) (pgx.Row, error) {
 
 	defer func() {
 		if r := recover(); r != nil {
-			var uuid uuid4.UUID
-			if id, ok := p.ctx.Value("uuid").(uuid4.UUID); ok {
-				uuid = id
-			}
-			p.log.Warn(fmt.Sprintf(
-				"[%s] %s, error: %v",
-				uuid, name, r,
-			))
+			p.log.Error(name, utils.LogCtxRecoverFields(p.ctx, r)...)
 		}
 	}()
 
@@ -91,14 +83,10 @@ func (p *PgsStorage) sqlRow(name, sql string, values ...any) (pgx.Row, error) {
 	}()
 
 	conn, err := p.pool.Acquire(ctx)
+
 	for i := 1; err != nil && i < tries*increase; i += increase {
 		time.Sleep(time.Duration(i) * time.Second)
-		if uuid, ok := ctx.Value("uuid").(uuid4.UUID); ok {
-			p.log.Warn(fmt.Sprintf(
-				"[%s] %s, retry pool acquire error: %v, time: %v",
-				uuid, name, err, time.Now(),
-			))
-		}
+		p.log.Warn(name, utils.LogCtxReasonErrFields(ctx, "retry pool acquire", err)...)
 		conn, err = p.pool.Acquire(ctx)
 	}
 	defer func() {
@@ -110,6 +98,5 @@ func (p *PgsStorage) sqlRow(name, sql string, values ...any) (pgx.Row, error) {
 	if conn == nil || err != nil {
 		return nil, fmt.Errorf("%v", err)
 	}
-
 	return conn.QueryRow(ctx, sql, values...), nil
 }
