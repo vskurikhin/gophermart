@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 10:39 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 14:48 by Victor N. Skurikhin.
  * holder.go
  * $Id$
  */
@@ -11,20 +11,15 @@ import (
 	"sync"
 )
 
-type Holder interface {
-	HandlerNumber() handlers.Handler
-	HandlerOrders() handlers.Handler
-}
-
 type holder struct {
 	number handlers.Handler
 	orders handlers.Handler
 }
 
 var once = new(sync.Once)
-var instance Holder
+var instance *holder
 
-func GetInstance() Holder {
+func getInstance() *holder {
 
 	once.Do(func() {
 		h := new(holder)
@@ -33,12 +28,4 @@ func GetInstance() Holder {
 		instance = h
 	})
 	return instance
-}
-
-func (h *holder) HandlerNumber() handlers.Handler {
-	return h.number
-}
-
-func (h *holder) HandlerOrders() handlers.Handler {
-	return h.orders
 }

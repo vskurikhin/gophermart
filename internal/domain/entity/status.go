@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 17:00 by Victor N. Skurikhin.
  * status.go
  * $Id$
  */
@@ -18,7 +18,7 @@ type Status struct {
 	updateAt  time.Time
 }
 
-func (s *Status) Id() int {
+func (s *Status) ID() int {
 	return s.id
 }
 
@@ -56,7 +56,7 @@ func FuncGetAllStatuss() func(storage.Storage) ([]*Status, error) {
 func FuncGetStatus() func(storage.Storage, int) (*Status, error) {
 	return func(s storage.Storage, id int) (*Status, error) {
 
-		row, err := s.GetById("SELECT status FROM status WHERE id = $1", id)
+		row, err := s.GetByID("SELECT status FROM status WHERE id = $1", id)
 		if err != nil {
 			return nil, err
 		}

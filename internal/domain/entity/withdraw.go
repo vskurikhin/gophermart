@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 21:33 by Victor N. Skurikhin.
  * withdraw.go
  * $Id$
  */
@@ -19,17 +19,13 @@ type Withdraw struct {
 	login     string
 	number    string
 	sum       big.Float
-	statusId  int
+	statusID  int
 	createdAt time.Time
 	updateAt  *time.Time
 }
 
-func NewWithdraw(login string, number string, sum big.Float, statusId int) *Withdraw {
-	return &Withdraw{login: login, number: number, sum: sum, statusId: statusId}
-}
-
-func NewWithdrawWithTime(login string, number string, sum big.Float, statusId int, createdAt time.Time, updateAt *time.Time) *Withdraw {
-	return &Withdraw{login: login, number: number, sum: sum, statusId: statusId, createdAt: createdAt, updateAt: updateAt}
+func NewWithdraw(login string, number string, sum big.Float, statusID int) *Withdraw {
+	return &Withdraw{login: login, number: number, sum: sum, statusID: statusID}
 }
 
 func (w *Withdraw) Login() string {
@@ -48,12 +44,12 @@ func (w *Withdraw) SetSum(sum big.Float) {
 	w.sum = sum
 }
 
-func (w *Withdraw) StatusId() int {
-	return w.statusId
+func (w *Withdraw) StatusID() int {
+	return w.statusID
 }
 
-func (w *Withdraw) SetStatusId(statusId int) {
-	w.statusId = statusId
+func (w *Withdraw) SetStatusID(statusID int) {
+	w.statusID = statusID
 }
 
 func (w *Withdraw) CreatedAt() time.Time {
@@ -76,13 +72,13 @@ func (w *Withdraw) Save(s storage.Storage) (*Withdraw, error) {
                sum = $3,
                status_id = $4
 		     RETURNING *`,
-		w.login, w.number, sum, w.statusId,
+		w.login, w.number, sum, w.statusID,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	pLogin, pNumber, pSum, pStatusId, pCreatedAt, pUpdateAt, err := extractWithdraw(row)
+	pLogin, pNumber, pSum, pStatusID, pCreatedAt, pUpdateAt, err := extractWithdraw(row)
 
 	if err != nil {
 		return nil, err
@@ -92,7 +88,7 @@ func (w *Withdraw) Save(s storage.Storage) (*Withdraw, error) {
 		login:     *pLogin,
 		number:    *pNumber,
 		sum:       *pSum,
-		statusId:  *pStatusId,
+		statusID:  *pStatusID,
 		createdAt: *pCreatedAt,
 		updateAt:  pUpdateAt,
 	}, nil
@@ -116,7 +112,7 @@ func FuncGetWithdraw() func(storage.Storage, string, string) (*Withdraw, error) 
 			return nil, err
 		}
 
-		pLogin, pNumber, pSum, pStatusId, pCreatedAt, pUpdateAt, err := extractWithdraw(row)
+		pLogin, pNumber, pSum, pStatusID, pCreatedAt, pUpdateAt, err := extractWithdraw(row)
 
 		if err != nil {
 			return nil, err
@@ -126,7 +122,7 @@ func FuncGetWithdraw() func(storage.Storage, string, string) (*Withdraw, error) 
 			login:     *pLogin,
 			number:    *pNumber,
 			sum:       *pSum,
-			statusId:  *pStatusId,
+			statusID:  *pStatusID,
 			createdAt: *pCreatedAt,
 			updateAt:  pUpdateAt,
 		}, nil
@@ -135,12 +131,12 @@ func FuncGetWithdraw() func(storage.Storage, string, string) (*Withdraw, error) 
 
 func extractWithdraw(row pgx.Row) (*string, *string, *big.Float, *int, *time.Time, *time.Time, error) {
 
-	var statusId int
+	var statusID int
 	var login, number, sSum string
 	var createdAt time.Time
 	var updateAtNullTime sql.NullTime
 
-	err := row.Scan(&login, &number, &sSum, &statusId, &createdAt, &updateAtNullTime)
+	err := row.Scan(&login, &number, &sSum, &statusID, &createdAt, &updateAtNullTime)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -155,5 +151,5 @@ func extractWithdraw(row pgx.Row) (*string, *string, *big.Float, *int, *time.Tim
 	if updateAtNullTime.Valid {
 		updateAt = &updateAtNullTime.Time
 	}
-	return &login, &number, sum, &statusId, &createdAt, updateAt, err
+	return &login, &number, sum, &statusID, &createdAt, updateAt, err
 }

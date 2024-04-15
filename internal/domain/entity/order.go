@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 16:59 by Victor N. Skurikhin.
  * order.go
  * $Id$
  */
@@ -16,18 +16,14 @@ import (
 type Order struct {
 	login      string
 	number     string
-	statusId   int
+	statusID   int
 	uploadedAt *time.Time
 	createdAt  time.Time
 	updateAt   *time.Time
 }
 
-func NewOrder(login string, number string, statusId int) *Order {
-	return &Order{login: login, number: number, statusId: statusId}
-}
-
-func NewUploadedOrder(login string, number string, statusId int, uploadedAt *time.Time) *Order {
-	return &Order{login: login, number: number, statusId: statusId, uploadedAt: uploadedAt}
+func NewOrder(login string, number string, statusID int) *Order {
+	return &Order{login: login, number: number, statusID: statusID}
 }
 
 func (o *Order) Login() string {
@@ -42,12 +38,12 @@ func (o *Order) SetNumber(number string) {
 	o.number = number
 }
 
-func (o *Order) StatusId() int {
-	return o.statusId
+func (o *Order) StatusID() int {
+	return o.statusID
 }
 
-func (o *Order) SetStatusId(statusId int) {
-	o.statusId = statusId
+func (o *Order) SetStatusID(statusID int) {
+	o.statusID = statusID
 }
 
 func (o *Order) UploadedAt() *time.Time {
@@ -80,13 +76,13 @@ func (o *Order) Save(s storage.Storage) (*Order, error) {
                status_id = $3,
                uploaded_at = $4
              RETURNING *`,
-		o.login, o.number, o.statusId, uploadedAtNullTime,
+		o.login, o.number, o.statusID, uploadedAtNullTime,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	pLogin, pNumber, pStatusId, pUploadedAt, pCreatedAt, pUpdateAt, err := extractOrder(row)
+	pLogin, pNumber, pStatusID, pUploadedAt, pCreatedAt, pUpdateAt, err := extractOrder(row)
 
 	if err != nil {
 		return nil, err
@@ -95,7 +91,7 @@ func (o *Order) Save(s storage.Storage) (*Order, error) {
 	return &Order{
 		login:      *pLogin,
 		number:     *pNumber,
-		statusId:   *pStatusId,
+		statusID:   *pStatusID,
 		uploadedAt: pUploadedAt,
 		createdAt:  *pCreatedAt,
 		updateAt:   pUpdateAt,
@@ -120,7 +116,7 @@ func FuncGetOrder() func(storage.Storage, string, string) (*Order, error) {
 			return nil, err
 		}
 
-		pLogin, pNumber, pStatusId, pUploadedAt, pCreatedAt, pUpdateAt, err := extractOrder(row)
+		pLogin, pNumber, pStatusID, pUploadedAt, pCreatedAt, pUpdateAt, err := extractOrder(row)
 
 		if err != nil {
 			return nil, err
@@ -129,7 +125,7 @@ func FuncGetOrder() func(storage.Storage, string, string) (*Order, error) {
 		return &Order{
 			login:      *pLogin,
 			number:     *pNumber,
-			statusId:   *pStatusId,
+			statusID:   *pStatusID,
 			uploadedAt: pUploadedAt,
 			createdAt:  *pCreatedAt,
 			updateAt:   pUpdateAt,
@@ -139,12 +135,12 @@ func FuncGetOrder() func(storage.Storage, string, string) (*Order, error) {
 
 func extractOrder(row pgx.Row) (*string, *string, *int, *time.Time, *time.Time, *time.Time, error) {
 
-	var statusId int
+	var statusID int
 	var login, number string
 	var createdAt time.Time
 	var uploadedAtNullTime, updateAtNullTime sql.NullTime
 
-	err := row.Scan(&login, &number, &statusId, &uploadedAtNullTime, &createdAt, &updateAtNullTime)
+	err := row.Scan(&login, &number, &statusID, &uploadedAtNullTime, &createdAt, &updateAtNullTime)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -159,5 +155,5 @@ func extractOrder(row pgx.Row) (*string, *string, *int, *time.Time, *time.Time, 
 	if updateAtNullTime.Valid {
 		updateAt = &updateAtNullTime.Time
 	}
-	return &login, &number, &statusId, uploadedAt, &createdAt, updateAt, err
+	return &login, &number, &statusID, uploadedAt, &createdAt, updateAt, err
 }

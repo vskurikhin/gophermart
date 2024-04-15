@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 12:04 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-15 21:27 by Victor N. Skurikhin.
  * db_pool.go
  * $Id$
  */
@@ -34,7 +34,7 @@ type dbPoolHealth struct {
 	status bool
 }
 
-func DBPool() DB {
+func GetDB() DB {
 	once.Do(func() {
 		cfg := env.GetConfig()
 		d := new(dbPoolHealth)
@@ -72,7 +72,7 @@ func newPgxPool(dataBaseDSN string) *pgxpool.Pool {
 		panic(err)
 	}
 	log.Debug("NewWithConfig pool created")
-	_, err = pool.Acquire(context.TODO())
+	_, err = pool.Acquire(context.Background())
 
 	if err != nil {
 		panic(err)
@@ -82,18 +82,18 @@ func newPgxPool(dataBaseDSN string) *pgxpool.Pool {
 	return pool
 }
 
-func (this *dbPoolHealth) DBPool() (*pgxpool.Pool, bool) {
-	this.RLock()
-	defer this.RUnlock()
-	return this.pool, this.status
+func (h *dbPoolHealth) DBPool() (*pgxpool.Pool, bool) {
+	h.RLock()
+	defer h.RUnlock()
+	return h.pool, h.status
 }
 
-func (this *dbPoolHealth) dbPing() error {
-	this.Lock()
-	defer this.Unlock()
+func (h *dbPoolHealth) dbPing() error {
+	h.Lock()
+	defer h.Unlock()
 
-	if this.pool == nil {
-		this.status = false
+	if h.pool == nil {
+		h.status = false
 		return errors.New("poll is nil")
 	}
 
@@ -103,7 +103,7 @@ func (this *dbPoolHealth) dbPing() error {
 		ctx.Done()
 	}()
 
-	conn, err := this.pool.Acquire(ctx)
+	conn, err := h.pool.Acquire(ctx)
 	defer func() {
 		if conn != nil {
 			conn.Release()
@@ -111,20 +111,20 @@ func (this *dbPoolHealth) dbPing() error {
 	}()
 
 	if conn == nil || err != nil {
-		this.status = false
+		h.status = false
 		return err
 	}
-	this.status = true
+	h.status = true
 
 	return nil
 }
 
-func (this *dbPoolHealth) checkStatus() {
+func (h *dbPoolHealth) checkStatus() {
 	for {
 		time.Sleep(2 * time.Second)
 		err := dbPoolHealthInstance.dbPing()
 		if err != nil {
-			this.log.Warn(
+			h.log.Warn(
 				"db health checkStatus ",
 				zap.String("error", fmt.Sprintf("%v", err)),
 			)
