@@ -9,11 +9,12 @@ CREATE TABLE IF NOT EXISTS "order"
     "created_at"  timestamp NOT NULL,
     "update_at"   timestamp,
     PRIMARY KEY ("login", "number"),
-    UNIQUE ("login", "number")
+    UNIQUE ("login", "number"),
+    UNIQUE ("number")
 );
 
 ALTER TABLE "order"
-    ADD FOREIGN KEY ("login") REFERENCES "balance" ("login");
+    ADD FOREIGN KEY ("login") REFERENCES "user" ("login");
 ALTER TABLE "order"
     ADD FOREIGN KEY ("status_id") REFERENCES "status" ("id");
 

@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 23:37 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-16 18:36 by Victor N. Skurikhin.
  * db_test.go
  * $Id$
  */
@@ -61,7 +61,7 @@ func TestDaoSaveGet(t *testing.T) {
 			save: func() (interface{}, error) {
 				store = store.WithContext(utils.NewIDContext())
 				repo0 := Orders(store)
-				test0 := entity.NewOrder("test1", "test1", 1)
+				test0 := entity.NewOrderStatus("test1", "test1", 1)
 				return repo0.Save(test0)
 			},
 			get: func() (interface{}, error) {

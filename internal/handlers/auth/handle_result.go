@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 10:44 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-18 23:06 by Victor N. Skurikhin.
  * handle_result.go
  * $Id$
  */
@@ -45,24 +45,26 @@ func (h *handleResult) handleUser(msg string, resultFunc func(ctx context.Contex
 
 	result := resultFunc(ctx, user)
 
-	if err, ok1 := result.(*handlers.ResultError); ok1 {
+	switch result.(type) {
+	case *handlers.ResultError:
 
-		render.Status(h.request, err.Status())
+		render.Status(h.request, result.Status())
+		e := result.(*handlers.ResultError)
 		//goland:noinspection GoUnhandledErrorResult
-		render.Render(h.response, h.request, model.Error(err.Error()))
+		render.Render(h.response, h.request, model.Error(e.Error()))
 
-		return
-	} else if token, ok2 := result.(*handlers.ResultString); ok2 {
+	case *handlers.ResultString:
 
-		http.SetCookie(h.response, utils.NewCookie(token.String()))
+		t := result.(*handlers.ResultString)
+		http.SetCookie(h.response, utils.NewCookie(t.String()))
 
 		if err := user.MarshalToWriter(h.response); err != nil {
 			panic(err)
 		}
-		return
-	} else {
-		err := fmt.Errorf("unknow result: %v, is result: %v, is error: %v", result, ok2, ok1)
+	default:
+
+		err := fmt.Errorf("unknow result: %v", result)
 		h.log.Debug(msg, utils.LogCtxRecoverFields(ctx, err)...)
+		render.Status(h.request, http.StatusInternalServerError)
 	}
-	render.Status(h.request, http.StatusInternalServerError)
 }

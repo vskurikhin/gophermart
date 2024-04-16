@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-16 18:36 by Victor N. Skurikhin.
  * orders.go
  * $Id$
  */
@@ -25,6 +25,10 @@ func (o *orders) GetAllOrders() ([]*entity.Order, error) {
 
 func (o *orders) GetOrder(login, number string) (*entity.Order, error) {
 	return entity.FuncGetOrder()(o.storage, login, number)
+}
+
+func (o *orders) Insert(order *entity.Order) (*entity.Order, error) {
+	return order.Insert(o.storage)
 }
 
 func (o *orders) Save(order *entity.Order) (*entity.Order, error) {

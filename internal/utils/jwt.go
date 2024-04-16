@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 17:07 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-16 17:36 by Victor N. Skurikhin.
  * jwt.go
  * $Id$
  */
@@ -7,6 +7,7 @@
 package utils
 
 import (
+	"fmt"
 	"github.com/go-chi/jwtauth"
 	"github.com/go-chi/render"
 	"github.com/lestrrat-go/jwx/jwt"
@@ -46,4 +47,18 @@ func UnLoggedInRedirection(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 		}
 	})
+}
+
+func GetLogin(request *http.Request) (*string, error) {
+
+	ctx := request.Context()
+	_, m, err := jwtauth.FromContext(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+	if login, ok := m["username"].(string); ok {
+		return &login, nil
+	}
+	return nil, fmt.Errorf("username not found")
 }
