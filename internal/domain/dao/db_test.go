@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 18:36 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 23:03 by Victor N. Skurikhin.
  * db_test.go
  * $Id$
  */
@@ -75,7 +75,7 @@ func TestDaoSaveGet(t *testing.T) {
 			save: func() (interface{}, error) {
 				store = store.WithContext(utils.NewIDContext())
 				repo0 := Withdraws(store)
-				test0 := entity.NewWithdraw("test1", "test1", *new(big.Float), 1)
+				test0 := entity.NewWithdraw("test1", "test1", *new(big.Float))
 				return repo0.Save(test0)
 			},
 			get: func() (interface{}, error) {

@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 19:59 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 23:01 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -26,10 +26,6 @@ type Balance struct {
 
 func NewBalance(login string, balance big.Float) *Balance {
 	return &Balance{login: login, balance: balance}
-}
-
-func NewBalanceWithdrawn(login string, balance big.Float, withdrawn big.Float) *Balance {
-	return &Balance{login: login, balance: balance, withdrawn: withdrawn}
 }
 
 func (b *Balance) Login() string {
@@ -67,6 +63,16 @@ func (b *Balance) AppendInsertTo(a storage.TxArgs) storage.TxArgs {
 	t := storage.NewTxArg(
 		`INSERT INTO balance (login, balance, withdrawn, created_at) VALUES ($1, $2, $3, now())`,
 		b.login, balance, withdrawn,
+	)
+	return append(a, t)
+}
+
+func (b *Balance) AppendWithdrawTo(a storage.TxArgs, sum big.Float) storage.TxArgs {
+
+	withdraw, _ := sum.Float64()
+	t := storage.NewTxArg(
+		`UPDATE balance SET balance = balance - $1 WHERE login = $2`,
+		withdraw, b.login,
 	)
 	return append(a, t)
 }

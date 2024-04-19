@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 17:30 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 00:12 by Victor N. Skurikhin.
  * time.go
  * $Id$
  */
@@ -16,9 +16,9 @@ type Time struct {
 }
 
 func (t *Time) MarshalEasyJSON(w *jwriter.Writer) {
-	w.RawString(t.Time.UTC().Round(time.Second).Format(time.RFC3339))
+	w.RawString(t.Time.Local().Round(time.Second).Format(time.RFC3339))
 }
 
 func (t *Time) MarshalJSON() ([]byte, error) {
-	return []byte(t.Time.UTC().Round(time.Second).Format(time.RFC3339)), nil
+	return []byte(t.Time.Local().Round(time.Second).Format(time.RFC3339)), nil
 }

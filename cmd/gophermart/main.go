@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 17:32 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 00:07 by Victor N. Skurikhin.
  * main.go
  * $Id$
  */
@@ -34,9 +34,14 @@ func main() {
 
 	router.Group(func(r chi.Router) {
 		r.Use(utils.Verifier())
-		r.Use(utils.UnLoggedInError)
-		r.Get("/api/user/orders", orders.UserOrdersHandlerFunc())
+		r.Use(utils.UnauthenticatedError)
 		r.Post("/api/user/orders", orders.UserNumberHandlerFunc())
+	})
+
+	router.Group(func(r chi.Router) {
+		r.Use(utils.Verifier())
+		r.Use(utils.UnauthorizedError)
+		r.Get("/api/user/orders", orders.UserOrdersHandlerFunc())
 
 		r.Get("/api/user/balance", accounts.BalanceHandlerFunc())
 		r.Post("/api/user/balance/withdraw", accounts.BalanceWithdrawHandlerFunc())

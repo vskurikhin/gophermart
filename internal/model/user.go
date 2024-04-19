@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 16:34 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 21:44 by Victor N. Skurikhin.
  * user.go
  * $Id$
  */
@@ -16,7 +16,7 @@ type User struct {
 	Password string `json:"password"` // пароль
 }
 
-func UnmarshalFromReader(reader io.Reader) (*User, error) {
+func UnmarshalUserFromReader(reader io.Reader) (*User, error) {
 
 	userRegister := new(User)
 

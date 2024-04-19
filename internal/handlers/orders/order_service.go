@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 20:15 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 22:06 by Victor N. Skurikhin.
  * order_service.go
  * $Id$
  */
@@ -45,7 +45,7 @@ func (s *service) Number(login, number string) handlers.Result {
 	const funcName = "service.Number"
 	defer utils.TraceInOut(s.ctx, funcName, "%s, %s", login, number)()
 
-	if !checkLuhn(number) {
+	if !utils.CheckLuhn(number) {
 		return handlers.ResultErrorBadFormatNumber()
 	}
 
@@ -63,26 +63,6 @@ func (s *service) Number(login, number string) handlers.Result {
 		return handlers.ResultInternalError()
 	}
 	return handlers.NewResultString(number, http.StatusCreated)
-}
-
-func checkLuhn(number string) bool {
-
-	var sum int
-	parity := len(number) % 2
-
-	for i := 0; i < len(number); i++ {
-		digit := int(number[i] - '0')
-
-		if i%2 == parity {
-			digit *= 2
-
-			if digit > 9 {
-				digit -= 9
-			}
-		}
-		sum += digit
-	}
-	return sum%10 == 0
 }
 
 func (s *service) Orders(login string) handlers.Result {

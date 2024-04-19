@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 18:18 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 23:01 by Victor N. Skurikhin.
  * zap_log_fields.go
  * $Id$
  */
@@ -27,7 +27,7 @@ func LogCtxReasonErrFields(ctx context.Context, reason string, err error) []zap.
 	return []zap.Field{
 		zap.String("reqId", middleware.GetReqID(ctx)),
 		zap.String("reason", reason),
-		zap.Reflect("error", err.Error()),
+		zap.String("error", err.Error()),
 	}
 }
 

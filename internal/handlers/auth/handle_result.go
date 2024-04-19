@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 17:39 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 21:44 by Victor N. Skurikhin.
  * handle_result.go
  * $Id$
  */
@@ -30,7 +30,7 @@ func newHandleResult(response http.ResponseWriter, request *http.Request) *handl
 func (h *handleResult) handleUser(msg string, resultFunc func(ctx context.Context, user *model.User) handlers.Result) {
 
 	ctx := h.request.Context()
-	user, err := model.UnmarshalFromReader(h.request.Body)
+	user, err := model.UnmarshalUserFromReader(h.request.Body)
 
 	if err != nil || user == nil {
 

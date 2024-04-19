@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 17:54 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 00:06 by Victor N. Skurikhin.
  * result_error.go
  * $Id$
  */
@@ -18,8 +18,10 @@ var ErrBalanceNotSet = fmt.Errorf("баланс не установлен")
 var ErrInternalError = fmt.Errorf("внутренняя ошибка сервера")
 var ErrOrderByUserAlreadyLoaded = fmt.Errorf("номер заказа уже был загружен этим пользователем")
 var ErrOrderOtherAlreadyLoaded = fmt.Errorf("номер заказа уже был загружен другим пользователем")
+var ErrStatusPaymentRequired = fmt.Errorf("на счету недостаточно средств")
 var ErrStatusConflict = fmt.Errorf("логин уже занят")
-var ErrUserUnauthorized = fmt.Errorf("пользователь не аутентифицирован")
+var ErrUserUnauthenticated = fmt.Errorf("пользователь не аутентифицирован")
+var ErrUserUnauthorized = fmt.Errorf("пользователь не авторизован")
 
 func ResultErrorBadFormatNumber() *ResultError {
 	return NewResultError(ErrBadFormatNumber, http.StatusUnprocessableEntity)
@@ -40,6 +42,11 @@ func ResultErrorOrderByUserAlreadyLoaded() *ResultError {
 func ResultErrorOrderOtherAlreadyLoaded() *ResultError {
 	return NewResultError(ErrOrderOtherAlreadyLoaded, http.StatusConflict)
 }
+
+func ResultErrorPaymentRequired() *ResultError {
+	return NewResultError(ErrStatusPaymentRequired, http.StatusPaymentRequired)
+}
+
 func ResultErrorStatusConflict() *ResultError {
 	return NewResultError(ErrStatusConflict, http.StatusConflict)
 }

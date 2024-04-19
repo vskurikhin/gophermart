@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 20:15 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 23:19 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -58,6 +58,8 @@ func (r *balance) Handle(response http.ResponseWriter, request *http.Request) {
 			if err := balance.MarshalToWriter(response); err == nil {
 				render.Status(request, value.Status())
 				return
+			} else {
+				r.log.Debug(balanceMsg, utils.LogCtxReasonErrFields(ctx, err.Error(), handlers.ErrInternalError)...)
 			}
 		}
 	}

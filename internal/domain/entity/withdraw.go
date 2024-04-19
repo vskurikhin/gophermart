@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 15:58 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 23:06 by Victor N. Skurikhin.
  * withdraw.go
  * $Id$
  */
@@ -24,8 +24,8 @@ type Withdraw struct {
 	updateAt  *time.Time
 }
 
-func NewWithdraw(login string, number string, sum big.Float, statusID int) *Withdraw {
-	return &Withdraw{login: login, number: number, sum: sum, statusID: statusID}
+func NewWithdraw(login string, number string, sum big.Float) *Withdraw {
+	return &Withdraw{login: login, number: number, sum: sum}
 }
 
 func (w *Withdraw) Login() string {
@@ -60,19 +60,28 @@ func (w *Withdraw) UpdateAt() *time.Time {
 	return w.updateAt
 }
 
+func (w *Withdraw) AppendInsertTo(a storage.TxArgs) storage.TxArgs {
+
+	sum, _ := w.sum.Float64()
+	t := storage.NewTxArg(
+		`INSERT INTO withdraw (login, number, sum, status_id, created_at) VALUES ($1, $2, $3, 1, now())`,
+		w.login, w.number, sum,
+	)
+	return append(a, t)
+}
+
 func (w *Withdraw) Save(s storage.Storage) (*Withdraw, error) {
 
 	sum, _ := w.sum.Float64()
 	row, err := s.Save(
 		`INSERT INTO withdraw
 				    (login, number, sum, status_id, created_at)
-             VALUES ($1, $2, $3, $4, now())
+             VALUES ($1, $2, $3, 1, now())
              ON CONFLICT (login, number)
              DO UPDATE SET
-               sum = $3,
-               status_id = $4
+               sum = $3
 		     RETURNING *`,
-		w.login, w.number, sum, w.statusID,
+		w.login, w.number, sum,
 	)
 	if err != nil {
 		return nil, err

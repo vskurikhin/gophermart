@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 20:15 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 23:20 by Victor N. Skurikhin.
  * orders.go
  * $Id$
  */
@@ -58,6 +58,8 @@ func (o *orders) Handle(response http.ResponseWriter, request *http.Request) {
 			if err := orders.MarshalToWriter(response); err == nil {
 				render.Status(request, value.Status())
 				return
+			} else {
+				o.log.Debug(ordersMsg, utils.LogCtxReasonErrFields(ctx, err.Error(), handlers.ErrInternalError)...)
 			}
 		}
 	}

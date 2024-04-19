@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 14:39 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 00:25 by Victor N. Skurikhin.
  * jwt.go
  * $Id$
  */
@@ -7,7 +7,6 @@
 package utils
 
 import (
-	"fmt"
 	"github.com/go-chi/jwtauth"
 	"github.com/go-chi/render"
 	"github.com/lestrrat-go/jwx/jwt"
@@ -35,30 +34,24 @@ func Verifier() func(http.Handler) http.Handler {
 	}
 }
 
-func UnLoggedInError(next http.Handler) http.Handler {
+func UnauthenticatedError(next http.Handler) http.Handler {
+	return unAuthError(next, handlers.ErrUserUnauthenticated)
+}
+
+func UnauthorizedError(next http.Handler) http.Handler {
+	return unAuthError(next, handlers.ErrUserUnauthorized)
+}
+
+func unAuthError(next http.Handler, err error) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, _, _ := jwtauth.FromContext(r.Context())
 
 		if token == nil || jwt.Validate(token) != nil {
-			//goland:noinspection GoUnhandledErrorResult
-			render.Render(w, r, model.Error(handlers.ErrUserUnauthorized))
 			http.Error(w, "", http.StatusUnauthorized)
+			//goland:noinspection GoUnhandledErrorResult
+			render.Render(w, r, model.Error(err))
 		} else {
 			next.ServeHTTP(w, r)
 		}
 	})
-}
-
-func GetLogin(request *http.Request) (*string, error) {
-
-	ctx := request.Context()
-	_, m, err := jwtauth.FromContext(ctx)
-
-	if err != nil {
-		return nil, err
-	}
-	if login, ok := m["username"].(string); ok {
-		return &login, nil
-	}
-	return nil, fmt.Errorf("username not found")
 }
