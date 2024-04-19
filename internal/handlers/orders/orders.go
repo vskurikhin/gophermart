@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 17:39 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 20:15 by Victor N. Skurikhin.
  * orders.go
  * $Id$
  */
@@ -12,6 +12,7 @@ import (
 	"github.com/vskurikhin/gophermart/internal/handlers/auth"
 	"github.com/vskurikhin/gophermart/internal/logger"
 	"github.com/vskurikhin/gophermart/internal/model"
+	"github.com/vskurikhin/gophermart/internal/storage"
 	"github.com/vskurikhin/gophermart/internal/utils"
 	"go.uber.org/zap"
 	"net/http"
@@ -41,7 +42,7 @@ func (o *orders) Handle(response http.ResponseWriter, request *http.Request) {
 
 		return
 	}
-	result := newService(ctx).Orders(*login)
+	result := newService(ctx, storage.NewPgsStorage()).Orders(*login)
 
 	switch value := result.(type) {
 	case *handlers.ResultError:

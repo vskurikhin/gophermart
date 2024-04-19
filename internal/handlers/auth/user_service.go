@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 19:04 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 21:08 by Victor N. Skurikhin.
  * user_service.go
  * $Id$
  */
@@ -12,12 +12,14 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/vskurikhin/gophermart/internal/domain/dao"
 	"github.com/vskurikhin/gophermart/internal/domain/entity"
+	"github.com/vskurikhin/gophermart/internal/domain/transaction"
 	"github.com/vskurikhin/gophermart/internal/handlers"
 	"github.com/vskurikhin/gophermart/internal/logger"
 	"github.com/vskurikhin/gophermart/internal/model"
 	"github.com/vskurikhin/gophermart/internal/storage"
 	"github.com/vskurikhin/gophermart/internal/utils"
 	"go.uber.org/zap"
+	"math/big"
 	"net/http"
 )
 
@@ -29,14 +31,14 @@ type UserService interface {
 type userService struct {
 	ctx   context.Context
 	log   *zap.Logger
-	store *storage.PgsStorage
+	store storage.Storage
 }
 
-func NewUserService(ctx context.Context) UserService {
+func NewUserService(ctx context.Context, store storage.Storage) UserService {
 	return &userService{
 		ctx:   ctx,
 		log:   logger.Get(),
-		store: storage.NewPgsStorage(),
+		store: store,
 	}
 }
 
@@ -96,11 +98,19 @@ func (u *userService) register(modelUser *model.User) (string, error) {
 		return "", err
 	}
 	entityUser := entity.NewUser(modelUser.Login, &hashed)
-	users := dao.Users(u.store.WithContext(u.ctx))
-	entityUser, err = users.Insert(entityUser)
+	entityBalance := entity.NewBalance(modelUser.Login, *big.NewFloat(0))
+	ub := transaction.UserBalance(u.store.WithContext(u.ctx))
+	err = ub.TransactionInsert(entityUser, entityBalance)
 
 	if err != nil {
-		u.log.Debug(regMsg, utils.LogCtxRecoverFields(u.ctx, err)...)
+		u.log.Debug(regMsg, utils.LogCtxReasonErrFields(u.ctx, regMsg, err)...)
+		return "", err
+	}
+	ud := dao.Users(u.store.WithContext(u.ctx))
+	entityUser, err = ud.GetUser(entityUser.Login())
+
+	if err != nil {
+		u.log.Debug(regMsg, utils.LogCtxReasonErrFields(u.ctx, regMsg, err)...)
 		return "", err
 	}
 	login := entityUser.Login()

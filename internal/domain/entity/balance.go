@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 18:11 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 19:59 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -58,6 +58,17 @@ func (b *Balance) CreatedAt() time.Time {
 
 func (b *Balance) UpdateAt() *time.Time {
 	return b.updateAt
+}
+
+func (b *Balance) AppendInsertTo(a storage.TxArgs) storage.TxArgs {
+
+	balance, _ := b.balance.Float64()
+	withdrawn, _ := b.withdrawn.Float64()
+	t := storage.NewTxArg(
+		`INSERT INTO balance (login, balance, withdrawn, created_at) VALUES ($1, $2, $3, now())`,
+		b.login, balance, withdrawn,
+	)
+	return append(a, t)
 }
 
 func (b *Balance) Save(s storage.Storage) (*Balance, error) {

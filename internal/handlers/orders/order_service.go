@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 17:12 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 20:15 by Victor N. Skurikhin.
  * order_service.go
  * $Id$
  */
@@ -29,14 +29,14 @@ type OrderService interface {
 type service struct {
 	ctx   context.Context
 	log   *zap.Logger
-	store *storage.PgsStorage
+	store storage.Storage
 }
 
-func newService(ctx context.Context) *service {
+func newService(ctx context.Context, store storage.Storage) *service {
 	return &service{
 		ctx:   ctx,
 		log:   logger.Get(),
-		store: storage.NewPgsStorage(),
+		store: store,
 	}
 }
 

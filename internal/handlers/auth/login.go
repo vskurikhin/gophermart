@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 14:39 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 20:15 by Victor N. Skurikhin.
  * login.go
  * $Id$
  */
@@ -13,6 +13,7 @@ import (
 	"github.com/vskurikhin/gophermart/internal/handlers"
 	"github.com/vskurikhin/gophermart/internal/logger"
 	"github.com/vskurikhin/gophermart/internal/model"
+	"github.com/vskurikhin/gophermart/internal/storage"
 	"go.uber.org/zap"
 	"net/http"
 )
@@ -31,7 +32,7 @@ func (l *login) Handle(response http.ResponseWriter, request *http.Request) {
 
 	hr := newHandleResult(response, request)
 	hr.handleUser(logMsg, func(ctx context.Context, userRegister *model.User) handlers.Result {
-		return NewUserService(ctx).Login(userRegister)
+		return NewUserService(ctx, storage.NewPgsStorage()).Login(userRegister)
 	})
 }
 
