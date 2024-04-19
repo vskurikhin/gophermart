@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 22:06 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 01:02 by Victor N. Skurikhin.
  * order_service.go
  * $Id$
  */
@@ -62,7 +62,7 @@ func (s *service) Number(login, number string) handlers.Result {
 		}
 		return handlers.ResultInternalError()
 	}
-	return handlers.NewResultString(number, http.StatusCreated)
+	return handlers.NewResultString(number, http.StatusAccepted)
 }
 
 func (s *service) Orders(login string) handlers.Result {

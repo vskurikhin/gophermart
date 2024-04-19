@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 23:01 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 01:19 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -175,11 +175,13 @@ func FuncGetBalance() func(storage.Storage, string) (*Balance, error) {
 
 func extractBalanceWithdrawn(row pgx.Row) (*string, *big.Float, *big.Float, *time.Time, *time.Time, *big.Float, error) {
 
-	var login, sBalance, sWithdrawn, sSum string
+	var login, sBalance, sWithdrawn string
 	var createdAt time.Time
 	var updateAtNullTime sql.NullTime
+	var sumNull sql.NullString
+	var sum *big.Float
 
-	err := row.Scan(&login, &sBalance, &sWithdrawn, &createdAt, &updateAtNullTime, &sSum)
+	err := row.Scan(&login, &sBalance, &sWithdrawn, &createdAt, &updateAtNullTime, &sumNull)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
@@ -199,10 +201,12 @@ func extractBalanceWithdrawn(row pgx.Row) (*string, *big.Float, *big.Float, *tim
 	if updateAtNullTime.Valid {
 		updateAt = &updateAtNullTime.Time
 	}
-	sum, ok := new(big.Float).SetString(sSum)
+	if sumNull.Valid {
+		sum, ok = new(big.Float).SetString(sumNull.String)
+	}
 
 	if !ok {
-		return &login, balance, withdrawn, &createdAt, updateAt, zero, errors.New("can't read sum")
+		return &login, balance, withdrawn, &createdAt, updateAt, zero, nil
 	}
 	return &login, balance, withdrawn, &createdAt, updateAt, sum, err
 }

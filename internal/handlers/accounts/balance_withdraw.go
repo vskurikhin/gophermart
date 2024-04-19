@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 23:20 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 00:34 by Victor N. Skurikhin.
  * balance_withdraw.go
  * $Id$
  */
@@ -75,5 +75,4 @@ func (r *balanceWithdraw) Handle(response http.ResponseWriter, request *http.Req
 		}
 	}
 	r.log.Debug(balanceWithdrawMsg, utils.InternalErrorZapField(ctx, request, result)...)
-
 }

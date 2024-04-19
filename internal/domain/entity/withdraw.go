@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 23:06 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 00:53 by Victor N. Skurikhin.
  * withdraw.go
  * $Id$
  */
@@ -87,25 +87,35 @@ func (w *Withdraw) Save(s storage.Storage) (*Withdraw, error) {
 		return nil, err
 	}
 
-	pLogin, pNumber, pSum, pStatusID, pCreatedAt, pUpdateAt, err := extractWithdraw(row)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &Withdraw{
-		login:     *pLogin,
-		number:    *pNumber,
-		sum:       *pSum,
-		statusID:  *pStatusID,
-		createdAt: *pCreatedAt,
-		updateAt:  pUpdateAt,
-	}, nil
+	return extractWithdraw(row)
 }
 
 func FuncGetAllWithdraw() func(storage.Storage) ([]*Withdraw, error) {
 	return func(s storage.Storage) ([]*Withdraw, error) {
 		result := make([]*Withdraw, 0)
+		return result, nil
+	}
+}
+
+func FuncGetAllWithdrawalsByLogin() func(storage.Storage, string) ([]*Withdraw, error) {
+	return func(s storage.Storage, login string) ([]*Withdraw, error) {
+		rows, err := s.GetAllForLogin(
+			`SELECT * FROM withdraw WHERE login = $1`,
+			login,
+		)
+		if err != nil {
+			return nil, err
+		}
+		result := make([]*Withdraw, 0)
+
+		for rows.Next() {
+			order, err := extractWithdraw(rows)
+			if err != nil {
+				return result, err
+			}
+			result = append(result, order)
+		}
+
 		return result, nil
 	}
 }
@@ -120,21 +130,7 @@ func FuncGetWithdraw() func(storage.Storage, string, string) (*Withdraw, error) 
 		if err != nil {
 			return nil, err
 		}
-
-		pLogin, pNumber, pSum, pStatusID, pCreatedAt, pUpdateAt, err := extractWithdraw(row)
-
-		if err != nil {
-			return nil, err
-		}
-
-		return &Withdraw{
-			login:     *pLogin,
-			number:    *pNumber,
-			sum:       *pSum,
-			statusID:  *pStatusID,
-			createdAt: *pCreatedAt,
-			updateAt:  pUpdateAt,
-		}, nil
+		return extractWithdraw(row)
 	}
 }
 
@@ -165,8 +161,25 @@ func FuncGetWithdrawSum() func(storage.Storage, string) (*big.Float, error) {
 		return zero, nil
 	}
 }
+func extractWithdraw(row pgx.Row) (*Withdraw, error) {
 
-func extractWithdraw(row pgx.Row) (*string, *string, *big.Float, *int, *time.Time, *time.Time, error) {
+	pLogin, pNumber, pSum, pStatusID, pCreatedAt, pUpdateAt, err := extractWithdrawTuple(row)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &Withdraw{
+		login:     *pLogin,
+		number:    *pNumber,
+		sum:       *pSum,
+		statusID:  *pStatusID,
+		createdAt: *pCreatedAt,
+		updateAt:  pUpdateAt,
+	}, nil
+}
+
+func extractWithdrawTuple(row pgx.Row) (*string, *string, *big.Float, *int, *time.Time, *time.Time, error) {
 
 	var statusID int
 	var login, number, sSum string
