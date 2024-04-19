@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 17:36 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 14:39 by Victor N. Skurikhin.
  * jwt.go
  * $Id$
  */
@@ -35,7 +35,7 @@ func Verifier() func(http.Handler) http.Handler {
 	}
 }
 
-func UnLoggedInRedirection(next http.Handler) http.Handler {
+func UnLoggedInError(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, _, _ := jwtauth.FromContext(r.Context())
 

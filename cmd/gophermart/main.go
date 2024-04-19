@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 12:35 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 17:32 by Victor N. Skurikhin.
  * main.go
  * $Id$
  */
@@ -11,6 +11,7 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/vskurikhin/gophermart/internal/env"
+	"github.com/vskurikhin/gophermart/internal/handlers/accounts"
 	"github.com/vskurikhin/gophermart/internal/handlers/auth"
 	"github.com/vskurikhin/gophermart/internal/handlers/orders"
 	"github.com/vskurikhin/gophermart/internal/logger"
@@ -24,18 +25,22 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.RequestID)
 	router.Use(zapchi.Logger(logger.Get(), "router"))
+	router.Use(render.SetContentType(render.ContentTypeJSON))
 
 	router.Group(func(r chi.Router) {
-		r.Use(render.SetContentType(render.ContentTypeJSON))
 		r.Post("/api/user/login", auth.UserLoginHandlerFunc())
 		r.Post("/api/user/register", auth.UserRegisterHandlerFunc())
 	})
 
 	router.Group(func(r chi.Router) {
 		r.Use(utils.Verifier())
-		r.Use(utils.UnLoggedInRedirection)
+		r.Use(utils.UnLoggedInError)
 		r.Get("/api/user/orders", orders.UserOrdersHandlerFunc())
 		r.Post("/api/user/orders", orders.UserNumberHandlerFunc())
+
+		r.Get("/api/user/balance", accounts.BalanceHandlerFunc())
+		r.Post("/api/user/balance/withdraw", accounts.BalanceWithdrawHandlerFunc())
+		r.Get("/api/user/withdrawals", accounts.WithdrawalsHandlerFunc())
 	})
 
 	err := http.ListenAndServe(env.GetConfig().Address(), router)

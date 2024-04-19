@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 10:44 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 14:39 by Victor N. Skurikhin.
  * login.go
  * $Id$
  */
@@ -8,6 +8,8 @@ package auth
 
 import (
 	"context"
+	"fmt"
+	"github.com/go-chi/jwtauth"
 	"github.com/vskurikhin/gophermart/internal/handlers"
 	"github.com/vskurikhin/gophermart/internal/logger"
 	"github.com/vskurikhin/gophermart/internal/model"
@@ -31,4 +33,17 @@ func (l *login) Handle(response http.ResponseWriter, request *http.Request) {
 	hr.handleUser(logMsg, func(ctx context.Context, userRegister *model.User) handlers.Result {
 		return NewUserService(ctx).Login(userRegister)
 	})
+}
+
+func Login(ctx context.Context) (*string, error) {
+
+	_, m, err := jwtauth.FromContext(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+	if login, ok := m["username"].(string); ok {
+		return &login, nil
+	}
+	return nil, fmt.Errorf("username not found")
 }

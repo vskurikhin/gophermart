@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-13 17:14 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 18:11 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -11,6 +11,7 @@ import (
 	"errors"
 	"github.com/jackc/pgx/v5"
 	"github.com/vskurikhin/gophermart/internal/storage"
+	"github.com/vskurikhin/gophermart/internal/utils"
 	"math/big"
 	"time"
 )
@@ -100,6 +101,36 @@ func FuncGetAllBalances() func(storage.Storage) ([]*Balance, error) {
 	}
 }
 
+func FuncGetBalanceWithdraw() func(storage.Storage, string) (*Balance, *big.Float, error) {
+	return func(s storage.Storage, login string) (*Balance, *big.Float, error) {
+
+		row, err := s.GetByLogin(
+			`SELECT *, (SELECT sum(sum) FROM withdraw WHERE login = $1) FROM balance WHERE login = $1`,
+			login,
+		)
+
+		if err != nil {
+			return nil, zero, err
+		}
+
+		_, pBalance, pWithdrawn, pCreatedAt, pUpdateAt, sum, err := extractBalanceWithdrawn(row)
+
+		if utils.IsErrNoRowsInResultSet(err) {
+			return &Balance{login: login, balance: *zero}, zero, err
+		} else if err != nil {
+			return nil, nil, err
+		}
+
+		return &Balance{
+			login:     login,
+			balance:   *pBalance,
+			withdrawn: *pWithdrawn,
+			createdAt: *pCreatedAt,
+			updateAt:  pUpdateAt,
+		}, sum, nil
+	}
+}
+
 func FuncGetBalance() func(storage.Storage, string) (*Balance, error) {
 	return func(s storage.Storage, login string) (*Balance, error) {
 
@@ -123,6 +154,40 @@ func FuncGetBalance() func(storage.Storage, string) (*Balance, error) {
 			updateAt:  pUpdateAt,
 		}, nil
 	}
+}
+
+func extractBalanceWithdrawn(row pgx.Row) (*string, *big.Float, *big.Float, *time.Time, *time.Time, *big.Float, error) {
+
+	var login, sBalance, sWithdrawn, sSum string
+	var createdAt time.Time
+	var updateAtNullTime sql.NullTime
+
+	err := row.Scan(&login, &sBalance, &sWithdrawn, &createdAt, &updateAtNullTime, &sSum)
+
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
+	balance, ok := new(big.Float).SetString(sBalance)
+
+	if !ok {
+		return nil, nil, nil, nil, nil, nil, errors.New("can't read balance")
+	}
+	withdrawn, ok := new(big.Float).SetString(sWithdrawn)
+
+	if !ok {
+		return nil, nil, nil, nil, nil, nil, errors.New("can't read withdrawn")
+	}
+	var updateAt *time.Time
+
+	if updateAtNullTime.Valid {
+		updateAt = &updateAtNullTime.Time
+	}
+	sum, ok := new(big.Float).SetString(sSum)
+
+	if !ok {
+		return &login, balance, withdrawn, &createdAt, updateAt, zero, errors.New("can't read sum")
+	}
+	return &login, balance, withdrawn, &createdAt, updateAt, sum, err
 }
 
 func extractBalance(row pgx.Row) (*string, *big.Float, *big.Float, *time.Time, *time.Time, error) {

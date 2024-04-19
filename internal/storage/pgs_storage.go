@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 16:57 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 11:27 by Victor N. Skurikhin.
  * pgs_storage.go
  * $Id$
  */
@@ -45,6 +45,12 @@ func (p *PgsStorage) GetAll(sql string) (pgx.Rows, error) {
 	const funcName = "PgsStorage.GetAll"
 	defer utils.TraceInOut(p.ctx, funcName, "%s", sql)()
 	return nil, errors.New("not implemented")
+}
+
+func (p *PgsStorage) GetAllForLogin(sql, login string) (pgx.Rows, error) {
+	const funcName = "PgsStorage.GetAllForLogin"
+	defer utils.TraceInOut(p.ctx, funcName, "%s, login", sql, login)()
+	return p.sqlRows(funcName, sql, login)
 }
 
 func (p *PgsStorage) GetByID(sql string, id int) (pgx.Row, error) {
@@ -102,4 +108,37 @@ func (p *PgsStorage) sqlRow(name, sql string, values ...any) (pgx.Row, error) {
 		return nil, fmt.Errorf("%v", err)
 	}
 	return conn.QueryRow(ctx, sql, values...), nil
+}
+
+func (p *PgsStorage) sqlRows(name, sql string, values ...any) (pgx.Rows, error) {
+
+	defer func() {
+		if r := recover(); r != nil {
+			p.log.Error(name, utils.LogCtxRecoverFields(p.ctx, r)...)
+		}
+	}()
+
+	ctx, cancel := context.WithTimeout(p.ctx, time.Duration(timeout)*time.Second)
+	defer func() {
+		cancel()
+		ctx.Done()
+	}()
+
+	conn, err := p.pool.Acquire(ctx)
+
+	for i := 1; err != nil && i < tries*increase; i += increase {
+		time.Sleep(time.Duration(i) * time.Second)
+		p.log.Warn(name, utils.LogCtxReasonErrFields(ctx, "retry pool acquire", err)...)
+		conn, err = p.pool.Acquire(ctx)
+	}
+	defer func() {
+		if conn != nil {
+			conn.Release()
+		}
+	}()
+
+	if conn == nil || err != nil {
+		return nil, fmt.Errorf("%v", err)
+	}
+	return conn.Query(ctx, sql, values...)
 }

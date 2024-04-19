@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 10:37 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 16:34 by Victor N. Skurikhin.
  * user.go
  * $Id$
  */
@@ -26,9 +26,9 @@ func UnmarshalFromReader(reader io.Reader) (*User, error) {
 	return userRegister, nil
 }
 
-func (u *User) MarshalToWriter(writer io.Writer) error {
+func (v *User) MarshalToWriter(writer io.Writer) error {
 
-	if _, err := easyjson.MarshalToWriter(u, writer); err != nil {
+	if _, err := easyjson.MarshalToWriter(v, writer); err != nil {
 		return err
 	}
 	return nil

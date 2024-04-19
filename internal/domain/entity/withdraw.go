@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 21:33 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 15:58 by Victor N. Skurikhin.
  * withdraw.go
  * $Id$
  */
@@ -126,6 +126,34 @@ func FuncGetWithdraw() func(storage.Storage, string, string) (*Withdraw, error) 
 			createdAt: *pCreatedAt,
 			updateAt:  pUpdateAt,
 		}, nil
+	}
+}
+
+var zero = big.NewFloat(0.0)
+
+func FuncGetWithdrawSum() func(storage.Storage, string) (*big.Float, error) {
+	return func(s storage.Storage, login string) (*big.Float, error) {
+
+		row, err := s.GetByLogin(
+			`SELECT sum(sum) FROM withdraw WHERE login = $1`,
+			login,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		var sSum string
+		err = row.Scan(&sSum)
+
+		if err != nil {
+			return zero, nil
+		}
+		sum, ok := new(big.Float).SetString(sSum)
+
+		if ok {
+			return sum, nil
+		}
+		return zero, nil
 	}
 }
 

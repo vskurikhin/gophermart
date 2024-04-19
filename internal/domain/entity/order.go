@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 18:42 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 11:40 by Victor N. Skurikhin.
  * order.go
  * $Id$
  */
@@ -118,6 +118,28 @@ func (o *Order) Save(s storage.Storage) (*Order, error) {
 func FuncGetAllOrders() func(storage.Storage) ([]*Order, error) {
 	return func(s storage.Storage) ([]*Order, error) {
 		result := make([]*Order, 0)
+		return result, nil
+	}
+}
+
+func FuncGetAllOrdersForLogin() func(storage.Storage, string) ([]*Order, error) {
+	return func(s storage.Storage, login string) ([]*Order, error) {
+
+		rows, err := s.GetAllForLogin(
+			`SELECT * FROM "order" WHERE login = $1`,
+			login,
+		)
+		if err != nil {
+			return nil, err
+		}
+		result := make([]*Order, 0)
+		for rows.Next() {
+			order, err := extractOrder(rows)
+			if err != nil {
+				return result, err
+			}
+			result = append(result, order)
+		}
 		return result, nil
 	}
 }

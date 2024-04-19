@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 17:02 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 19:04 by Victor N. Skurikhin.
  * user_service.go
  * $Id$
  */
@@ -78,11 +78,11 @@ func (u *userService) Register(modelUser *model.User) handlers.Result {
 	token, err := u.register(modelUser)
 
 	if pe, ok := err.(*pgconn.PgError); ok && isIntegrityConstraintViolation(pe) {
-		return handlers.NewResultError(handlers.ErrStatusConflict, http.StatusConflict)
+		return handlers.ResultErrorStatusConflict()
 	} else if err != nil {
-		return handlers.NewResultError(handlers.ErrBadRequest, http.StatusBadRequest)
+		return handlers.ResultErrorBadRequest()
 	} else if token == "" {
-		return handlers.NewResultError(handlers.ErrBadRequest, http.StatusInternalServerError)
+		return handlers.ResultInternalError()
 	}
 	return handlers.NewResultString(token, http.StatusOK)
 }

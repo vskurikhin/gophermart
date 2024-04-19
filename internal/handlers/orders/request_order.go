@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-18 20:56 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 14:39 by Victor N. Skurikhin.
  * request_order.go
  * $Id$
  */
@@ -8,9 +8,8 @@ package orders
 
 import (
 	"context"
-	"fmt"
-	"github.com/go-chi/jwtauth"
 	"github.com/vskurikhin/gophermart/internal/handlers"
+	"github.com/vskurikhin/gophermart/internal/handlers/auth"
 	"io"
 	"log"
 	"net/http"
@@ -51,17 +50,8 @@ func (o requestOrder) LoginNumber() (*string, *string, error) {
 }
 
 func (o *requestOrder) Login() (*string, error) {
-
 	ctx := o.request.Context()
-	_, m, err := jwtauth.FromContext(ctx)
-
-	if err != nil {
-		return nil, err
-	}
-	if login, ok := m["username"].(string); ok {
-		return &login, nil
-	}
-	return nil, fmt.Errorf("username not found")
+	return auth.Login(ctx)
 }
 
 var reTextPlain, _ = regexp.Compile(`^text/plain.*`)

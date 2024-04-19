@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-18 23:06 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 17:39 by Victor N. Skurikhin.
  * handle_result.go
  * $Id$
  */
@@ -8,7 +8,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-chi/render"
 	"github.com/vskurikhin/gophermart/internal/handlers"
 	"github.com/vskurikhin/gophermart/internal/logger"
@@ -45,26 +44,22 @@ func (h *handleResult) handleUser(msg string, resultFunc func(ctx context.Contex
 
 	result := resultFunc(ctx, user)
 
-	switch result.(type) {
+	switch value := result.(type) {
 	case *handlers.ResultError:
 
 		render.Status(h.request, result.Status())
-		e := result.(*handlers.ResultError)
 		//goland:noinspection GoUnhandledErrorResult
-		render.Render(h.response, h.request, model.Error(e.Error()))
+		render.Render(h.response, h.request, model.Error(value.Error()))
 
 	case *handlers.ResultString:
 
-		t := result.(*handlers.ResultString)
-		http.SetCookie(h.response, utils.NewCookie(t.String()))
+		http.SetCookie(h.response, utils.NewCookie(value.String()))
 
-		if err := user.MarshalToWriter(h.response); err != nil {
-			panic(err)
+		h.response.Header().Set("Content-Type", "application/json")
+		if err := user.MarshalToWriter(h.response); err == nil {
+			render.Status(h.request, result.Status())
+			return
 		}
-	default:
-
-		err := fmt.Errorf("unknow result: %v", result)
-		h.log.Debug(msg, utils.LogCtxRecoverFields(ctx, err)...)
-		render.Status(h.request, http.StatusInternalServerError)
 	}
+	h.log.Debug(msg, utils.InternalErrorZapField(ctx, h.request, result)...)
 }

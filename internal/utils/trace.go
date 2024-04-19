@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 23:37 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-19 11:27 by Victor N. Skurikhin.
  * trace.go
  * $Id$
  */
@@ -19,7 +19,7 @@ func TraceInOut(ctx context.Context, name, format string, values ...any) func() 
 
 	log := logger.Get()
 
-	if log.Level() != zap.DebugLevel {
+	if log.Level() > zap.DebugLevel {
 		return func() {}
 	}
 	reqID := middleware.GetReqID(ctx)
