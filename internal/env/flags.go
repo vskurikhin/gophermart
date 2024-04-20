@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 19:09 by Victor N. Skurikhin.
  * flags.go
  * $Id$
  */
@@ -56,7 +56,7 @@ func newFlags() *flags {
 	f.developmentLogger = pflag.BoolP(
 		"development-logger",
 		"z",
-		true,
+		false,
 		"help message for development logger",
 	)
 	f.rateLimit = pflag.IntP(

@@ -5,7 +5,7 @@ PROJECTNAME=$(shell basename "$(PWD)")
 # Go related variables.
 GOBASE=$(shell pwd)
 GOPATH="$(GOBASE)/vendor:$(GOBASE)"
-GOBIN=$(GOBASE)/bin
+GOBIN=$(GOBASE)/cmd/gophermart
 GOFILES=$(wildcard *.go)
 
 # Redirect error output to a file, so we can show it in development mode.
@@ -88,7 +88,7 @@ go-clean:
 test:
 	@echo "  > Test Iteration ..."
 	go vet -vettool=$(which statictest) ./...
-	cd bin && ./gophermarttest -test.v -test.run=^TestGophermart$$ -gophermart-binary-path=./gophermart -gophermart-host=localhost -gophermart-port=$(GOPHER_MART_PORT) -gophermart-database-uri="postgresql://postgres:postgres@localhost/praktikum?sslmode=disable" -accrual-binary-path=./accrual -accrual-host=localhost -accrual-port=$(ACCRUAL_PORT) -accrual-database-uri="postgresql://postgres:postgres@localhost/praktikum?sslmode=disable"
+	cd cmd/gophermart && ./gophermarttest -test.v -test.run=^TestGophermart$$ -gophermart-binary-path=./gophermart -gophermart-host=localhost -gophermart-port=$(GOPHER_MART_PORT) -gophermart-database-uri="postgresql://postgres:postgres@localhost/praktikum?sslmode=disable" -accrual-binary-path=./accrual -accrual-host=localhost -accrual-port=$(ACCRUAL_PORT) -accrual-database-uri="postgresql://postgres:postgres@localhost/praktikum?sslmode=disable"
 
 .PHONY: help
 all: help

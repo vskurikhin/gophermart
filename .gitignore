@@ -13,7 +13,9 @@
 
 # Binaries
 cmd/gophermart/main
+cmd/gophermart/accrual
 cmd/gophermart/gophermart
+cmd/gophermart/gophermarttest
 
 # Dependency directories (remove the comment below to include it)
 bin/
