@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 20:49 by Victor N. Skurikhin.
  * storage.go
  * $Id$
  */
@@ -12,17 +12,13 @@ import (
 )
 
 type Storage interface {
-	GetAll(sql string) (pgx.Rows, error)
-
-	GetAllForLogin(sql, login string) (pgx.Rows, error)
+	GetAllForString(sql, login string) (pgx.Rows, error)
 
 	GetByID(sql string, id int) (pgx.Row, error)
 
-	GetByLogin(sql, login string) (pgx.Row, error)
+	GetByString(sql, str string) (pgx.Row, error)
 
-	GetByLoginNumber(sql, login, number string) (pgx.Row, error)
-
-	GetByNumber(sql, login string) (pgx.Row, error)
+	GetByStr1Str2(sql, str1, str2 string) (pgx.Row, error)
 
 	Save(sql string, values ...any) (pgx.Row, error)
 

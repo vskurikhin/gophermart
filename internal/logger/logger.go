@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 09:51 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-21 01:06 by Victor N. Skurikhin.
  * logger.go
  * $Id$
  */
@@ -24,7 +24,7 @@ func Get() *zap.Logger {
 			log = zap.Must(config.Build())
 		} else {
 			config := zap.NewProductionConfig()
-			config.Level = zap.NewAtomicLevelAt(zapcore.WarnLevel)
+			config.Level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
 			log = zap.Must(config.Build())
 		}
 	})

@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 22:35 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 19:35 by Victor N. Skurikhin.
  * db_pool.go
  * $Id$
  */
@@ -10,6 +10,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/vskurikhin/gophermart/internal/env"
 	"github.com/vskurikhin/gophermart/internal/logger"
@@ -55,16 +56,14 @@ func newPgxPool(dataBaseDSN string) *pgxpool.Pool {
 		panic(err)
 	}
 	log.Debug("DBConnect config parsed")
-	/*
-		config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
-			log.Debug("Acquire connect ping...")
-			if err = conn.Ping(ctx); err != nil {
-				panic(err)
-			}
-			log.Debug("Acquire connect Ok")
-			return nil
+
+	config.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		if err := conn.Ping(ctx); err != nil {
+			log.Debug("Acquire connect ping", zap.String("error", err.Error()))
 		}
-	*/
+		return err
+	}
+
 	pool, err := pgxpool.NewWithConfig(context.Background(), config)
 
 	if err != nil {

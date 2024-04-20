@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:46 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 20:49 by Victor N. Skurikhin.
  * withdraw.go
  * $Id$
  */
@@ -58,7 +58,7 @@ func (w *Withdraw) AppendInsertTo(a storage.TxArgs) storage.TxArgs {
 
 func FuncGetAllWithdrawalsByLogin() func(storage.Storage, string) ([]*Withdraw, error) {
 	return func(s storage.Storage, login string) ([]*Withdraw, error) {
-		rows, err := s.GetAllForLogin(
+		rows, err := s.GetAllForString(
 			`SELECT * FROM withdraw WHERE login = $1 ORDER BY processed_at, created_at`,
 			login,
 		)

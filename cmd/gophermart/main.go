@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 19:13 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-21 01:14 by Victor N. Skurikhin.
  * main.go
  * $Id$
  */
@@ -83,6 +83,7 @@ func routerSetup() *chi.Mux {
 	})
 
 	router.Group(func(r chi.Router) {
+		r.Use(middleware.Compress(3))
 		r.Use(utils.Verifier())
 		r.Use(utils.UnauthorizedError)
 		r.Get("/api/user/orders", orders.UserOrdersHandlerFunc())
