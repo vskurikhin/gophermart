@@ -2,19 +2,21 @@
 -- +goose StatementBegin
 CREATE TABLE "withdraw"
 (
-    "login"      varchar,
-    "number"     varchar,
-    "sum"        numeric   NOT NULL DEFAULT 0,
-    "status_id"  integer   NOT NULL,
-    "created_at" timestamp NOT NULL,
-    "update_at"  timestamp,
-    PRIMARY KEY ("login", "number")
+    "login"        varchar,
+    "number"       varchar,
+    "sum"          numeric   NOT NULL DEFAULT 0,
+    "status_id"    integer   NOT NULL,
+    "processed_at" timestamp,
+    "created_at"   timestamp NOT NULL,
+    "update_at"    timestamp,
+    PRIMARY KEY ("login", "number"),
+    UNIQUE ("number")
 );
 
 ALTER TABLE "withdraw"
     ADD FOREIGN KEY ("status_id") REFERENCES "status" ("id");
 ALTER TABLE "withdraw"
-    ADD FOREIGN KEY ("login", "number") REFERENCES "order" ("login", "number");
+    ADD FOREIGN KEY ("login") REFERENCES "users" ("login");
 
 DROP TRIGGER IF EXISTS set_created_at_in_withdraw ON "withdraw";
 CREATE TRIGGER set_created_at_in_withdraw

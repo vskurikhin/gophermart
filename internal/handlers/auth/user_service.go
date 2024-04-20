@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 21:08 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * user_service.go
  * $Id$
  */
@@ -79,7 +79,7 @@ func (u *userService) Register(modelUser *model.User) handlers.Result {
 
 	token, err := u.register(modelUser)
 
-	if pe, ok := err.(*pgconn.PgError); ok && isIntegrityConstraintViolation(pe) {
+	if pe, ok := err.(*pgconn.PgError); ok && isIntegrityConstraintViolationUsersPkey(pe) {
 		return handlers.ResultErrorStatusConflict()
 	} else if err != nil {
 		return handlers.ResultErrorBadRequest()
@@ -119,9 +119,9 @@ func (u *userService) register(modelUser *model.User) (string, error) {
 	return token, nil
 }
 
-func isIntegrityConstraintViolation(pe *pgconn.PgError) bool {
+func isIntegrityConstraintViolationUsersPkey(pe *pgconn.PgError) bool {
 	return pgerrcode.IsIntegrityConstraintViolation(pe.Code) &&
-		pe.ConstraintName == "user_pkey"
+		pe.ConstraintName == "users_pkey"
 }
 
 func passwordOk(modelUser *model.User, entityUser *entity.User) bool {

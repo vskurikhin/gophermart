@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 22:38 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * balance_withdraw.go
  * $Id$
  */
@@ -23,7 +23,8 @@ func (u *balanceWithdraw) TransactionWithdraw(balance *entity.Balance, withdraw 
 
 	args := make(storage.TxArgs, 0)
 	args = withdraw.AppendInsertTo(args)
-	args = balance.AppendWithdrawTo(args, withdraw.Sum())
+	sum := withdraw.Sum()
+	args = balance.AppendWithdrawTo(args, &sum)
 
 	return u.store.Transaction(args)
 }

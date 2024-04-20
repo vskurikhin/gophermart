@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 09:51 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * flags.go
  * $Id$
  */
@@ -16,6 +16,15 @@ type flags struct {
 	dataBaseDSN          *string
 	developmentLogger    *bool
 	key                  *string
+	rateLimit            *int
+}
+
+func (f *flags) RateLimit() int {
+	if f.rateLimit == nil {
+		return 60
+	} else {
+		return *f.rateLimit
+	}
 }
 
 func newFlags() *flags {
@@ -49,6 +58,12 @@ func newFlags() *flags {
 		"z",
 		true,
 		"help message for development logger",
+	)
+	f.rateLimit = pflag.IntP(
+		"rate-limit",
+		"l",
+		60,
+		"help message for rate limit",
 	)
 	pflag.Parse()
 

@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 23:20 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * orders.go
  * $Id$
  */
@@ -8,6 +8,7 @@ package orders
 
 import (
 	"github.com/go-chi/render"
+	"github.com/vskurikhin/gophermart/internal/clients/accrual"
 	"github.com/vskurikhin/gophermart/internal/handlers"
 	"github.com/vskurikhin/gophermart/internal/handlers/auth"
 	"github.com/vskurikhin/gophermart/internal/logger"
@@ -42,7 +43,8 @@ func (o *orders) Handle(response http.ResponseWriter, request *http.Request) {
 
 		return
 	}
-	result := newService(ctx, storage.NewPgsStorage()).Orders(*login)
+	result := newService(ctx, storage.NewPgsStorage(), accrual.GetWorkers()).
+		Orders(*login)
 
 	switch value := result.(type) {
 	case *handlers.ResultError:

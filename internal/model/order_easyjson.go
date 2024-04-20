@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 17:30 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * order_easyjson.go
  * $Id$
  */
@@ -44,8 +44,18 @@ func easyjson120d1ca2DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer
 		switch key {
 		case "number":
 			out.Number = string(in.String())
+		case "status":
+			out.Status = string(in.String())
 		case "accrual":
-			out.Accrual = int(in.Int())
+			if in.IsNull() {
+				in.Skip()
+				out.Accrual = nil
+			} else {
+				if out.Accrual == nil {
+					out.Accrual = new(Float)
+				}
+				*out.Accrual = Float(in.Float64())
+			}
 		case "uploaded_at":
 			if data := in.Raw(); in.Ok() {
 				in.AddError((out.UploadedAt).UnmarshalJSON(data))
@@ -69,10 +79,15 @@ func easyjson120d1ca2EncodeGithubComVskurikhinGophermartInternalModel(out *jwrit
 		out.RawString(prefix[1:])
 		out.String(string(in.Number))
 	}
-	if in.Accrual != 0 {
+	{
+		const prefix string = ",\"status\":"
+		out.RawString(prefix)
+		out.String(string(in.Status))
+	}
+	if in.Accrual != nil {
 		const prefix string = ",\"accrual\":"
 		out.RawString(prefix)
-		out.Int(int(in.Accrual))
+		(*in.Accrual).MarshalEasyJSON(out)
 	}
 	{
 		const prefix string = ",\"uploaded_at\":"

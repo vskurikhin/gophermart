@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 21:04 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * pgs_storage.go
  * $Id$
  */
@@ -69,6 +69,12 @@ func (p *PgsStorage) GetByLoginNumber(sql, login, number string) (pgx.Row, error
 	const funcName = "PgsStorage.GetByLoginNumber"
 	defer utils.TraceInOut(p.ctx, funcName, "%s, %s, %s", sql, login, number)()
 	return p.sqlRow(funcName, sql, login, number)
+}
+
+func (p *PgsStorage) GetByNumber(sql, number string) (pgx.Row, error) {
+	const funcName = "PgsStorage.GetByNumber"
+	defer utils.TraceInOut(p.ctx, funcName, "%s, %s", sql, number)()
+	return p.sqlRow(funcName, sql, number)
 }
 
 func (p *PgsStorage) Save(sql string, values ...any) (pgx.Row, error) {

@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 16:34 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * order.go
  * $Id$
  */
@@ -13,7 +13,8 @@ import (
 
 type Order struct {
 	Number     string `json:"number"`
-	Accrual    int    `json:"accrual,omitempty"`
+	Status     string `json:"status"`
+	Accrual    *Float `json:"accrual,omitempty"`
 	UploadedAt Time   `json:"uploaded_at"`
 }
 

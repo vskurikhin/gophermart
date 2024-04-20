@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 01:20 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * account_service.go
  * $Id$
  */
@@ -23,6 +23,8 @@ import (
 	"net/http"
 )
 
+const accountServiceMsg = "account service"
+
 type AccountService interface {
 	Balance(login string) handlers.Result
 }
@@ -43,21 +45,22 @@ func newService(ctx context.Context, store storage.Storage) *service {
 
 func (s *service) Balance(login string) handlers.Result {
 
-	const funcName = "service.Balance"
+	const funcName = "service.Current"
 	defer utils.TraceInOut(s.ctx, funcName, "%s", login)()
 
 	db := dao.Balances(s.store.WithContext(s.ctx))
 	b, sum, err := db.GetBalanceWithdraw(login)
 
 	if err != nil && !utils.IsErrNoRowsInResultSet(err) {
+		s.log.Debug(accountServiceMsg, utils.LogCtxReasonErrFields(s.ctx, "get balance", err)...)
 		return handlers.ResultInternalError()
 	} else if utils.IsErrNoRowsInResultSet(err) {
-		s.log.Debug(balanceMsg, utils.LogCtxReasonErrFields(s.ctx, err.Error(), handlers.ErrBalanceNotSet)...)
+		s.log.Debug(accountServiceMsg, utils.LogCtxReasonErrFields(s.ctx, err.Error(), handlers.ErrBalanceNotSet)...)
 	}
 	if sum == nil {
 		sum = big.NewFloat(0)
 	}
-	balance := model.NewBalanceBigFloat(b.Balance(), *sum)
+	balance := model.NewBalanceBigFloat(b.Current(), *sum)
 
 	return handlers.NewResultAny(balance, http.StatusOK)
 }
@@ -76,7 +79,7 @@ func (s *service) Withdraw(login string, modelWithdraw *model.Withdraw) handlers
 	if err != nil {
 		return handlers.ResultInternalError()
 	}
-	balance := entityBalance.Balance()
+	balance := entityBalance.Current()
 	sum := big.NewFloat(modelWithdraw.GetSum())
 
 	if sum.Cmp(&balance) > 0 {
@@ -93,6 +96,7 @@ func (s *service) Withdraw(login string, modelWithdraw *model.Withdraw) handlers
 		}
 	}
 	if err != nil {
+		s.log.Debug(accountServiceMsg, utils.LogCtxReasonErrFields(s.ctx, "transaction withdraw", err)...)
 		return handlers.ResultInternalError()
 	}
 	b := entityWithdraw.Sum()
@@ -116,11 +120,20 @@ func (s *service) Withdrawals(login string) handlers.Result {
 	for _, withdraw := range withdrawals {
 		bs := withdraw.Sum()
 		sum, _ := bs.Float64()
+		var processedAt *model.Time
+		if withdraw.ProcessedAt() == nil {
+			processedAt = &model.Time{Time: withdraw.CreatedAt()}
+		} else {
+			processedAt = &model.Time{Time: *withdraw.ProcessedAt()}
+		}
 		result = append(result, model.Withdraw{
 			Order:       withdraw.Number(),
 			Sum:         model.Float(sum),
-			ProcessedAt: &model.Time{Time: withdraw.CreatedAt()},
+			ProcessedAt: processedAt,
 		})
+	}
+	if len(result) == 0 {
+		return handlers.NewResultString("[]", http.StatusNoContent)
 	}
 	return handlers.NewResultAny(result, http.StatusOK)
 }

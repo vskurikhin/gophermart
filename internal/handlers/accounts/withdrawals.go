@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 00:56 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * withdrawals.go
  * $Id$
  */
@@ -28,6 +28,7 @@ func newWithdraws() *withdrawals {
 	return &withdrawals{log: logger.Get()}
 }
 
+//goland:noinspection GoUnhandledErrorResult
 func (r *withdrawals) Handle(response http.ResponseWriter, request *http.Request) {
 
 	ctx := request.Context()
@@ -48,7 +49,6 @@ func (r *withdrawals) Handle(response http.ResponseWriter, request *http.Request
 	case *handlers.ResultError:
 
 		render.Status(request, value.Status())
-		//goland:noinspection GoUnhandledErrorResult
 		render.Render(response, request, model.Error(value.Error()))
 
 	case *handlers.ResultAny:
@@ -62,6 +62,12 @@ func (r *withdrawals) Handle(response http.ResponseWriter, request *http.Request
 				r.log.Debug(withdrawalsMsg, utils.LogCtxReasonErrFields(ctx, err.Error(), handlers.ErrInternalError)...)
 			}
 		}
+	case *handlers.ResultString:
+		response.Header().Set("Content-Type", "application/json")
+		// response.Write([]byte(value.String()))
+		render.Status(request, value.Status())
+		render.Render(response, request, model.NewEmptyList())
+		return
 	}
 	r.log.Debug(withdrawalsMsg, utils.InternalErrorZapField(ctx, request, result)...)
 }

@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 01:19 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -18,26 +18,26 @@ import (
 
 type Balance struct {
 	login     string
-	balance   big.Float
+	current   big.Float
 	withdrawn big.Float
 	createdAt time.Time
 	updateAt  *time.Time
 }
 
-func NewBalance(login string, balance big.Float) *Balance {
-	return &Balance{login: login, balance: balance}
+func NewBalance(login string, current big.Float) *Balance {
+	return &Balance{login: login, current: current}
 }
 
 func (b *Balance) Login() string {
 	return b.login
 }
 
-func (b *Balance) Balance() big.Float {
-	return b.balance
+func (b *Balance) Current() big.Float {
+	return b.current
 }
 
-func (b *Balance) SetBalance(balance big.Float) {
-	b.balance = balance
+func (b *Balance) SetCurrent(balance big.Float) {
+	b.current = balance
 }
 
 func (b *Balance) Withdrawn() big.Float {
@@ -58,20 +58,30 @@ func (b *Balance) UpdateAt() *time.Time {
 
 func (b *Balance) AppendInsertTo(a storage.TxArgs) storage.TxArgs {
 
-	balance, _ := b.balance.Float64()
+	balance, _ := b.current.Float64()
 	withdrawn, _ := b.withdrawn.Float64()
 	t := storage.NewTxArg(
-		`INSERT INTO balance (login, balance, withdrawn, created_at) VALUES ($1, $2, $3, now())`,
+		`INSERT INTO "balance" (login, current, withdrawn, created_at) VALUES ($1, $2, $3, now())`,
 		b.login, balance, withdrawn,
 	)
 	return append(a, t)
 }
 
-func (b *Balance) AppendWithdrawTo(a storage.TxArgs, sum big.Float) storage.TxArgs {
+func (b *Balance) AppendAccrualTo(a storage.TxArgs, sum *big.Float) storage.TxArgs {
+
+	accuracy, _ := sum.Float64()
+	t := storage.NewTxArg(
+		`UPDATE "balance" SET current = current + $1 WHERE login = $2`,
+		accuracy, b.login,
+	)
+	return append(a, t)
+}
+
+func (b *Balance) AppendWithdrawTo(a storage.TxArgs, sum *big.Float) storage.TxArgs {
 
 	withdraw, _ := sum.Float64()
 	t := storage.NewTxArg(
-		`UPDATE balance SET balance = balance - $1 WHERE login = $2`,
+		`UPDATE "balance" SET current = current - $1 WHERE login = $2`,
 		withdraw, b.login,
 	)
 	return append(a, t)
@@ -79,15 +89,15 @@ func (b *Balance) AppendWithdrawTo(a storage.TxArgs, sum big.Float) storage.TxAr
 
 func (b *Balance) Save(s storage.Storage) (*Balance, error) {
 
-	balance, _ := b.balance.Float64()
+	balance, _ := b.current.Float64()
 	withdrawn, _ := b.withdrawn.Float64()
 	row, err := s.Save(
-		`INSERT INTO balance
-				    (login, balance, withdrawn, created_at)
+		`INSERT INTO "balance"
+				    (login, current, withdrawn, created_at)
              VALUES ($1, $2, $3, now())
              ON CONFLICT (login)
              DO UPDATE SET
-               balance = $2,
+               current = $2,
                withdrawn = $3
              RETURNING *`,
 		b.login, balance, withdrawn,
@@ -104,7 +114,7 @@ func (b *Balance) Save(s storage.Storage) (*Balance, error) {
 
 	return &Balance{
 		login:     *pLogin,
-		balance:   *pBalance,
+		current:   *pBalance,
 		withdrawn: *pWithdrawn,
 		createdAt: *pCreatedAt,
 		updateAt:  pUpdateAt,
@@ -122,7 +132,7 @@ func FuncGetBalanceWithdraw() func(storage.Storage, string) (*Balance, *big.Floa
 	return func(s storage.Storage, login string) (*Balance, *big.Float, error) {
 
 		row, err := s.GetByLogin(
-			`SELECT *, (SELECT sum(sum) FROM withdraw WHERE login = $1) FROM balance WHERE login = $1`,
+			`SELECT *, (SELECT sum(sum) FROM withdraw WHERE login = $1) FROM "balance" WHERE login = $1`,
 			login,
 		)
 
@@ -130,17 +140,17 @@ func FuncGetBalanceWithdraw() func(storage.Storage, string) (*Balance, *big.Floa
 			return nil, zero, err
 		}
 
-		_, pBalance, pWithdrawn, pCreatedAt, pUpdateAt, sum, err := extractBalanceWithdrawn(row)
+		_, pCurrent, pWithdrawn, pCreatedAt, pUpdateAt, sum, err := extractBalanceWithdrawn(row)
 
 		if utils.IsErrNoRowsInResultSet(err) {
-			return &Balance{login: login, balance: *zero}, zero, err
+			return &Balance{login: login, current: *zero}, zero, err
 		} else if err != nil {
 			return nil, nil, err
 		}
 
 		return &Balance{
 			login:     login,
-			balance:   *pBalance,
+			current:   *pCurrent,
 			withdrawn: *pWithdrawn,
 			createdAt: *pCreatedAt,
 			updateAt:  pUpdateAt,
@@ -157,7 +167,7 @@ func FuncGetBalance() func(storage.Storage, string) (*Balance, error) {
 			return nil, err
 		}
 
-		_, pBalance, pWithdrawn, pCreatedAt, pUpdateAt, err := extractBalance(row)
+		_, pCurrent, pWithdrawn, pCreatedAt, pUpdateAt, err := extractBalance(row)
 
 		if err != nil {
 			return nil, err
@@ -165,7 +175,7 @@ func FuncGetBalance() func(storage.Storage, string) (*Balance, error) {
 
 		return &Balance{
 			login:     login,
-			balance:   *pBalance,
+			current:   *pCurrent,
 			withdrawn: *pWithdrawn,
 			createdAt: *pCreatedAt,
 			updateAt:  pUpdateAt,
@@ -175,21 +185,21 @@ func FuncGetBalance() func(storage.Storage, string) (*Balance, error) {
 
 func extractBalanceWithdrawn(row pgx.Row) (*string, *big.Float, *big.Float, *time.Time, *time.Time, *big.Float, error) {
 
-	var login, sBalance, sWithdrawn string
+	var login, sCurrent, sWithdrawn string
 	var createdAt time.Time
 	var updateAtNullTime sql.NullTime
 	var sumNull sql.NullString
 	var sum *big.Float
 
-	err := row.Scan(&login, &sBalance, &sWithdrawn, &createdAt, &updateAtNullTime, &sumNull)
+	err := row.Scan(&login, &sCurrent, &sWithdrawn, &createdAt, &updateAtNullTime, &sumNull)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, nil, err
 	}
-	balance, ok := new(big.Float).SetString(sBalance)
+	balance, ok := new(big.Float).SetString(sCurrent)
 
 	if !ok {
-		return nil, nil, nil, nil, nil, nil, errors.New("can't read balance")
+		return nil, nil, nil, nil, nil, nil, errors.New("can't read current")
 	}
 	withdrawn, ok := new(big.Float).SetString(sWithdrawn)
 
@@ -213,19 +223,19 @@ func extractBalanceWithdrawn(row pgx.Row) (*string, *big.Float, *big.Float, *tim
 
 func extractBalance(row pgx.Row) (*string, *big.Float, *big.Float, *time.Time, *time.Time, error) {
 
-	var login, sBalance, sWithdrawn string
+	var login, sCurrent, sWithdrawn string
 	var createdAt time.Time
 	var updateAtNullTime sql.NullTime
 
-	err := row.Scan(&login, &sBalance, &sWithdrawn, &createdAt, &updateAtNullTime)
+	err := row.Scan(&login, &sCurrent, &sWithdrawn, &createdAt, &updateAtNullTime)
 
 	if err != nil {
 		return nil, nil, nil, nil, nil, err
 	}
-	balance, ok := new(big.Float).SetString(sBalance)
+	balance, ok := new(big.Float).SetString(sCurrent)
 
 	if !ok {
-		return nil, nil, nil, nil, nil, errors.New("can't read balance")
+		return nil, nil, nil, nil, nil, errors.New("can't read current")
 	}
 	withdrawn, ok := new(big.Float).SetString(sWithdrawn)
 

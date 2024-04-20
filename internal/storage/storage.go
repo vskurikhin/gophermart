@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 21:04 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * storage.go
  * $Id$
  */
@@ -21,6 +21,8 @@ type Storage interface {
 	GetByLogin(sql, login string) (pgx.Row, error)
 
 	GetByLoginNumber(sql, login, number string) (pgx.Row, error)
+
+	GetByNumber(sql, login string) (pgx.Row, error)
 
 	Save(sql string, values ...any) (pgx.Row, error)
 

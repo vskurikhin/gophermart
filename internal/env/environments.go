@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 22:15 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * environments.go
  * $Id$
  */
@@ -9,6 +9,7 @@ package env
 import (
 	"fmt"
 	"github.com/caarlos0/env"
+	"regexp"
 	"strconv"
 )
 
@@ -37,9 +38,21 @@ func (e *environments) address() string {
 	return parseAddress(e.Address)
 }
 
+var reHTTP, _ = regexp.Compile(`^http.*`)
+
 func parseAddress(address []string) string {
 
-	if len(address) != 2 {
+	if len(address) < 2 {
+		return ""
+	}
+	var host string
+
+	if reHTTP.MatchString(address[0]) {
+		address = address[1:]
+		host = address[0][2:]
+	} else if !reHTTP.MatchString(address[0]) {
+		host = address[0]
+	} else {
 		return ""
 	}
 	port, err := strconv.Atoi(address[1])
@@ -47,5 +60,5 @@ func parseAddress(address []string) string {
 	if err != nil {
 		panic(err)
 	}
-	return fmt.Sprintf("%s:%d", address[0], port)
+	return fmt.Sprintf("%s:%d", host, port)
 }

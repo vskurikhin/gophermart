@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 00:42 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * db_test.go
  * $Id$
  */
@@ -43,7 +43,7 @@ func TestDaoSaveGet(t *testing.T) {
 			},
 		},
 		{
-			name: "Test #2 Balance",
+			name: "Test #2 Current",
 			save: func() (interface{}, error) {
 				store = store.WithContext(utils.NewIDContext())
 				repo0 := Balances(store)

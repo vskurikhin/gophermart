@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-16 09:51 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * config.go
  * $Id$
  */
@@ -16,6 +16,7 @@ type Config interface {
 	DataBaseDSN() string
 	DevelopmentLogger() bool
 	Key() string
+	RateLimit() int
 }
 
 type config struct {
@@ -24,6 +25,7 @@ type config struct {
 	dataBaseDSN          string
 	developmentLogger    bool
 	key                  string
+	rateLimit            int
 }
 
 var once = new(sync.Once)
@@ -60,6 +62,7 @@ func GetConfig() Config {
 			cfg.key = *f.Key()
 		}
 		cfg.developmentLogger = f.DevelopmentLogger()
+		cfg.rateLimit = f.RateLimit()
 	})
 
 	return cfg
@@ -83,4 +86,8 @@ func (c *config) DevelopmentLogger() bool {
 
 func (c *config) Key() string {
 	return c.key
+}
+
+func (c *config) RateLimit() int {
+	return c.rateLimit
 }

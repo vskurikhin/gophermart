@@ -1,6 +1,6 @@
 /*
  * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
- * withdraw_easyjson.go
+ * accrual_easyjson.go
  * $Id$
  */
 
@@ -23,7 +23,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson4f4a6fc6DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer.Lexer, out *Withdraw) {
+func easyjsonB608c935DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer.Lexer, out *Accrual) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -44,20 +44,10 @@ func easyjson4f4a6fc6DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer
 		switch key {
 		case "order":
 			out.Order = string(in.String())
-		case "sum":
-			(out.Sum).UnmarshalEasyJSON(in)
-		case "processed_at":
-			if in.IsNull() {
-				in.Skip()
-				out.ProcessedAt = nil
-			} else {
-				if out.ProcessedAt == nil {
-					out.ProcessedAt = new(Time)
-				}
-				if data := in.Raw(); in.Ok() {
-					in.AddError((*out.ProcessedAt).UnmarshalJSON(data))
-				}
-			}
+		case "status":
+			out.Status = string(in.String())
+		case "accrual":
+			out.Accrual = Float(in.Float64())
 		default:
 			in.SkipRecursive()
 		}
@@ -68,7 +58,7 @@ func easyjson4f4a6fc6DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer
 		in.Consumed()
 	}
 }
-func easyjson4f4a6fc6EncodeGithubComVskurikhinGophermartInternalModel(out *jwriter.Writer, in Withdraw) {
+func easyjsonB608c935EncodeGithubComVskurikhinGophermartInternalModel(out *jwriter.Writer, in Accrual) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -78,38 +68,38 @@ func easyjson4f4a6fc6EncodeGithubComVskurikhinGophermartInternalModel(out *jwrit
 		out.String(string(in.Order))
 	}
 	{
-		const prefix string = ",\"sum\":"
+		const prefix string = ",\"status\":"
 		out.RawString(prefix)
-		(in.Sum).MarshalEasyJSON(out)
+		out.String(string(in.Status))
 	}
-	if in.ProcessedAt != nil {
-		const prefix string = ",\"processed_at\":"
+	{
+		const prefix string = ",\"accrual\":"
 		out.RawString(prefix)
-		(*in.ProcessedAt).MarshalEasyJSON(out)
+		(in.Accrual).MarshalEasyJSON(out)
 	}
 	out.RawByte('}')
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v Withdraw) MarshalJSON() ([]byte, error) {
+func (v Accrual) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson4f4a6fc6EncodeGithubComVskurikhinGophermartInternalModel(&w, v)
+	easyjsonB608c935EncodeGithubComVskurikhinGophermartInternalModel(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v Withdraw) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson4f4a6fc6EncodeGithubComVskurikhinGophermartInternalModel(w, v)
+func (v Accrual) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonB608c935EncodeGithubComVskurikhinGophermartInternalModel(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *Withdraw) UnmarshalJSON(data []byte) error {
+func (v *Accrual) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson4f4a6fc6DecodeGithubComVskurikhinGophermartInternalModel(&r, v)
+	easyjsonB608c935DecodeGithubComVskurikhinGophermartInternalModel(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *Withdraw) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson4f4a6fc6DecodeGithubComVskurikhinGophermartInternalModel(l, v)
+func (v *Accrual) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonB608c935DecodeGithubComVskurikhinGophermartInternalModel(l, v)
 }

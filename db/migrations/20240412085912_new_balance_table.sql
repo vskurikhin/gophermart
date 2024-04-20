@@ -3,14 +3,14 @@
 CREATE TABLE IF NOT EXISTS "balance"
 (
     "login"      varchar PRIMARY KEY,
-    "balance"    numeric   NOT NULL DEFAULT 0,
+    "current"    numeric   NOT NULL DEFAULT 0,
     "withdrawn"  numeric   NOT NULL DEFAULT 0,
     "created_at" timestamp NOT NULL,
     "update_at"  timestamp
 );
 
 ALTER TABLE "balance"
-    ADD FOREIGN KEY ("login") REFERENCES "user" ("login");
+    ADD FOREIGN KEY ("login") REFERENCES "users" ("login");
 
 DROP TRIGGER IF EXISTS set_created_at_in_balance ON "balance";
 CREATE TRIGGER set_created_at_in_balance
