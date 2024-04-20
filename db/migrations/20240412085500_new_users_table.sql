@@ -1,6 +1,6 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS "user"
+CREATE TABLE IF NOT EXISTS "users"
 (
     "login"      varchar PRIMARY KEY,
     "password"   varchar,
@@ -8,22 +8,22 @@ CREATE TABLE IF NOT EXISTS "user"
     "update_at"  timestamp
 );
 
-DROP TRIGGER IF EXISTS set_created_at_in_user ON "user";
+DROP TRIGGER IF EXISTS set_created_at_in_user ON "users";
 CREATE TRIGGER set_created_at_in_status
     BEFORE UPDATE
-    ON "user"
+    ON "users"
     FOR EACH ROW
 EXECUTE FUNCTION set_created_at();
 
-DROP TRIGGER IF EXISTS set_update_at_in_user ON "user";
+DROP TRIGGER IF EXISTS set_update_at_in_user ON "users";
 CREATE TRIGGER set_update_at_in_status
     BEFORE UPDATE
-    ON "user"
+    ON "users"
     FOR EACH ROW
 EXECUTE FUNCTION set_update_at();
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS "user";
+DROP TABLE IF EXISTS "users";
 -- +goose StatementEnd

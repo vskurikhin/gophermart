@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 15:10 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
  * user.go
  * $Id$
  */
@@ -46,9 +46,7 @@ func (u *User) UpdateAt() *time.Time {
 
 func (u *User) Insert(s storage.Storage) (*User, error) {
 	row, err := s.Save(
-		`INSERT INTO "user" (login, password, created_at)
-             VALUES ($1, $2, now())
-             RETURNING *`,
+		`INSERT INTO "users" (login, password, created_at) VALUES ($1, $2, now()) RETURNING *`,
 		u.login, u.password,
 	)
 	if err != nil {
@@ -58,10 +56,19 @@ func (u *User) Insert(s storage.Storage) (*User, error) {
 	return extractUser(row)
 }
 
+func (u *User) AppendInsertTo(a storage.TxArgs) storage.TxArgs {
+
+	t := storage.NewTxArg(
+		`INSERT INTO "users" (login, password, created_at) VALUES ($1, $2, now())`,
+		u.login, u.password,
+	)
+	return append(a, t)
+}
+
 func (u *User) Save(s storage.Storage) (*User, error) {
 
 	row, err := s.Save(
-		`INSERT INTO "user" (login, password, created_at)
+		`INSERT INTO "users" (login, password, created_at)
              VALUES ($1, $2, now())
              ON CONFLICT (login)
              DO UPDATE SET
@@ -87,7 +94,7 @@ func FuncGetUser() func(storage.Storage, string) (*User, error) {
 	return func(s storage.Storage, login string) (*User, error) {
 
 		row, err := s.GetByLogin(
-			`SELECT * FROM "user" WHERE login = $1`,
+			`SELECT * FROM "users" WHERE login = $1`,
 			login,
 		)
 		if err != nil {

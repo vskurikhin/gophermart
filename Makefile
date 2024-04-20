@@ -87,7 +87,7 @@ go-clean:
 
 test:
 	@echo "  > Test Iteration ..."
-	cd bin && ./gophermarttest -test.v -test.run=^TestGophermart$$ -gophermart-binary-path=./gophermart -gophermart-host=localhost -gophermart-port=$(GOPHER_MART_PORT) -gophermart-database-uri="postgresql://postgres:postgres@localhost/praktikum?sslmode=disable" -accrual-binary-path=./accrual -accrual-host=localhost -accrual-port=$(ACCRUAL_PORT) -accrual-database-uri="postgresql://postgres:postgres@localhost/praktikum?sslmode=disable"
+	cd bin && ./gophermarttest -test.v -test.run=^TestGophermart$$ -gophermart-binary-path=./gophermart -gophermart-host=localhost -gophermart-port=$(GOPHER_MART_PORT) -gophermart-database-uri="postgresql://postgres:postgres@localhost/praktikum?sslmode=disable" -accrual-binary-path=./accrual -accrual-host=localhost -accrual-port=8077 -accrual-database-uri="postgresql://postgres:postgres@localhost/praktikum?sslmode=disable"
 
 .PHONY: help
 all: help

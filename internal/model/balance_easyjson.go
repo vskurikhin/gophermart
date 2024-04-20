@@ -1,6 +1,6 @@
 /*
- * This file was last modified at 2024-04-15 13:04 by Victor N. Skurikhin.
- * user_register_easyjson.go
+ * This file was last modified at 2024-04-19 16:34 by Victor N. Skurikhin.
+ * balance_easyjson.go
  * $Id$
  */
 
@@ -23,7 +23,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjson822f4455DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer.Lexer, out *UserRegister) {
+func easyjsonBed2650eDecodeGithubComVskurikhinGophermartInternalModel(in *jlexer.Lexer, out *Balance) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -42,10 +42,10 @@ func easyjson822f4455DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer
 			continue
 		}
 		switch key {
-		case "login":
-			out.Login = string(in.String())
-		case "password":
-			out.Password = string(in.String())
+		case "current":
+			out.Current = Float(in.Float64())
+		case "withdrawn":
+			out.Withdrawn = Float(in.Float64())
 		default:
 			in.SkipRecursive()
 		}
@@ -56,43 +56,43 @@ func easyjson822f4455DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer
 		in.Consumed()
 	}
 }
-func easyjson822f4455EncodeGithubComVskurikhinGophermartInternalModel(out *jwriter.Writer, in UserRegister) {
+func easyjsonBed2650eEncodeGithubComVskurikhinGophermartInternalModel(out *jwriter.Writer, in Balance) {
 	out.RawByte('{')
 	first := true
 	_ = first
 	{
-		const prefix string = ",\"login\":"
+		const prefix string = ",\"current\":"
 		out.RawString(prefix[1:])
-		out.String(string(in.Login))
+		(in.Current).MarshalEasyJSON(out)
 	}
 	{
-		const prefix string = ",\"password\":"
+		const prefix string = ",\"withdrawn\":"
 		out.RawString(prefix)
-		out.String(string(in.Password))
+		(in.Withdrawn).MarshalEasyJSON(out)
 	}
 	out.RawByte('}')
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v UserRegister) MarshalJSON() ([]byte, error) {
+func (b Balance) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
-	easyjson822f4455EncodeGithubComVskurikhinGophermartInternalModel(&w, v)
+	easyjsonBed2650eEncodeGithubComVskurikhinGophermartInternalModel(&w, b)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v UserRegister) MarshalEasyJSON(w *jwriter.Writer) {
-	easyjson822f4455EncodeGithubComVskurikhinGophermartInternalModel(w, v)
+func (b Balance) MarshalEasyJSON(w *jwriter.Writer) {
+	easyjsonBed2650eEncodeGithubComVskurikhinGophermartInternalModel(w, b)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *UserRegister) UnmarshalJSON(data []byte) error {
+func (b *Balance) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
-	easyjson822f4455DecodeGithubComVskurikhinGophermartInternalModel(&r, v)
+	easyjsonBed2650eDecodeGithubComVskurikhinGophermartInternalModel(&r, b)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *UserRegister) UnmarshalEasyJSON(l *jlexer.Lexer) {
-	easyjson822f4455DecodeGithubComVskurikhinGophermartInternalModel(l, v)
+func (b *Balance) UnmarshalEasyJSON(l *jlexer.Lexer) {
+	easyjsonBed2650eDecodeGithubComVskurikhinGophermartInternalModel(l, b)
 }

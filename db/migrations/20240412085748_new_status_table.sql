@@ -22,11 +22,12 @@ CREATE TRIGGER set_update_at_in_status
     FOR EACH ROW
 EXECUTE FUNCTION set_update_at();
 
-INSERT INTO "status" ("status", "created_at")
-VALUES ('NEW', now()),
-       ('PROCESSING', now()),
-       ('INVALID', now()),
-       ('PROCESSED', now());
+INSERT INTO "status" ("id", "status", "created_at")
+VALUES (0, 'NEW', now()),
+       (1, 'REGISTERED', now()),
+       (2, 'PROCESSING', now()),
+       (3, 'INVALID', now()),
+       (4, 'PROCESSED', now());
 -- +goose StatementEnd
 
 -- +goose Down
