@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 18:09 by Victor N. Skurikhin.
  * order.go
  * $Id$
  */
@@ -24,44 +24,20 @@ type Order struct {
 	updateAt   *time.Time
 }
 
-func (o *Order) Login() string {
-	return o.login
-}
-
 func (o *Order) Number() string {
 	return o.number
-}
-
-func (o *Order) SetNumber(number string) {
-	o.number = number
 }
 
 func (o *Order) Status() string {
 	return o.status
 }
 
-func (o *Order) SetStatus(status string) {
-	o.status = status
-}
-
 func (o *Order) Accrual() *big.Float {
 	return o.accrual
 }
 
-func (o *Order) SetAccrual(accrual *big.Float) {
-	o.accrual = accrual
-}
-
 func (o *Order) UploadedAt() *time.Time {
 	return o.uploadedAt
-}
-
-func (o *Order) CreatedAt() time.Time {
-	return o.createdAt
-}
-
-func (o *Order) UpdateAt() *time.Time {
-	return o.updateAt
 }
 
 func FuncGetAllOrdersForLogin() func(storage.Storage, string) ([]*Order, error) {

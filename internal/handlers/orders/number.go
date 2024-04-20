@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 18:03 by Victor N. Skurikhin.
  * number.go
  * $Id$
  */
@@ -28,6 +28,7 @@ func newNumber() *number {
 	return &number{log: logger.Get()}
 }
 
+//goland:noinspection GoUnhandledErrorResult
 func (n *number) Handle(response http.ResponseWriter, request *http.Request) {
 
 	ctx := request.Context()
@@ -37,27 +38,19 @@ func (n *number) Handle(response http.ResponseWriter, request *http.Request) {
 
 		n.log.Debug(numMsg, utils.LogCtxRecoverFields(ctx, err)...)
 		render.Status(request, http.StatusBadRequest)
-		//goland:noinspection GoUnhandledErrorResult
 		render.Render(response, request, model.Error(handlers.ErrBadRequest))
 
 		return
 	}
 	result := newService(ctx, storage.NewPgsStorage(), accrual.GetWorkers()).
 		Number(*login, *number)
+	render.Status(request, result.Status())
 
 	switch value := result.(type) {
 	case *handlers.ResultError:
-
-		render.Status(request, result.Status())
-		//goland:noinspection GoUnhandledErrorResult
 		render.Render(response, request, model.Error(value.Error()))
-
 	case *handlers.ResultString:
-
-		render.Status(request, result.Status())
-		//goland:noinspection GoUnhandledErrorResult
 		render.Render(response, request, model.NewNumber(value.String()))
-
 	default:
 		n.log.Debug(numMsg, utils.InternalErrorZapField(ctx, request, result)...)
 	}

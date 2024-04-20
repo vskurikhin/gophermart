@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 23:19 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 18:06 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -28,6 +28,7 @@ func newBalance() *balance {
 	return &balance{log: logger.Get()}
 }
 
+//goland:noinspection GoUnhandledErrorResult
 func (r *balance) Handle(response http.ResponseWriter, request *http.Request) {
 
 	ctx := request.Context()
@@ -37,26 +38,21 @@ func (r *balance) Handle(response http.ResponseWriter, request *http.Request) {
 
 		r.log.Debug(balanceMsg, utils.LogCtxRecoverFields(ctx, err)...)
 		render.Status(request, http.StatusBadRequest)
-		//goland:noinspection GoUnhandledErrorResult
 		render.Render(response, request, model.Error(handlers.ErrBadRequest))
 
 		return
 	}
 	result := newService(ctx, storage.NewPgsStorage()).Balance(*login)
+	render.Status(request, result.Status())
 
 	switch value := result.(type) {
 	case *handlers.ResultError:
-
-		render.Status(request, value.Status())
-		//goland:noinspection GoUnhandledErrorResult
 		render.Render(response, request, model.Error(value.Error()))
-
 	case *handlers.ResultAny:
 
 		if balance, ok := value.Result().(*model.Balance); ok {
 			response.Header().Set("Content-Type", "application/json")
 			if err := balance.MarshalToWriter(response); err == nil {
-				render.Status(request, value.Status())
 				return
 			} else {
 				r.log.Debug(balanceMsg, utils.LogCtxReasonErrFields(ctx, err.Error(), handlers.ErrInternalError)...)

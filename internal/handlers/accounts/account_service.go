@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:54 by Victor N. Skurikhin.
  * account_service.go
  * $Id$
  */
@@ -49,7 +49,7 @@ func (s *service) Balance(login string) handlers.Result {
 	defer utils.TraceInOut(s.ctx, funcName, "%s", login)()
 
 	db := dao.Balances(s.store.WithContext(s.ctx))
-	b, sum, err := db.GetBalanceWithdraw(login)
+	b, err := db.GetBalanceWithdraw(login)
 
 	if err != nil && !utils.IsErrNoRowsInResultSet(err) {
 		s.log.Debug(accountServiceMsg, utils.LogCtxReasonErrFields(s.ctx, "get balance", err)...)
@@ -57,10 +57,7 @@ func (s *service) Balance(login string) handlers.Result {
 	} else if utils.IsErrNoRowsInResultSet(err) {
 		s.log.Debug(accountServiceMsg, utils.LogCtxReasonErrFields(s.ctx, err.Error(), handlers.ErrBalanceNotSet)...)
 	}
-	if sum == nil {
-		sum = big.NewFloat(0)
-	}
-	balance := model.NewBalanceBigFloat(b.Current(), *sum)
+	balance := model.NewBalanceBigFloat(b.Current(), b.Sum())
 
 	return handlers.NewResultAny(balance, http.StatusOK)
 }

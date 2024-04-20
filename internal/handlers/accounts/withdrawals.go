@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 18:07 by Victor N. Skurikhin.
  * withdrawals.go
  * $Id$
  */
@@ -38,25 +38,21 @@ func (r *withdrawals) Handle(response http.ResponseWriter, request *http.Request
 
 		r.log.Debug(withdrawalsMsg, utils.LogCtxRecoverFields(ctx, err)...)
 		render.Status(request, http.StatusBadRequest)
-		//goland:noinspection GoUnhandledErrorResult
 		render.Render(response, request, model.Error(handlers.ErrBadRequest))
 
 		return
 	}
 	result := newService(ctx, storage.NewPgsStorage()).Withdrawals(*login)
+	render.Status(request, result.Status())
 
 	switch value := result.(type) {
 	case *handlers.ResultError:
-
-		render.Status(request, value.Status())
 		render.Render(response, request, model.Error(value.Error()))
-
 	case *handlers.ResultAny:
 
 		if withdrawals, ok := value.Result().(model.Withdrawals); ok {
 			response.Header().Set("Content-Type", "application/json")
 			if err := withdrawals.MarshalToWriter(response); err == nil {
-				render.Status(request, value.Status())
 				return
 			} else {
 				r.log.Debug(withdrawalsMsg, utils.LogCtxReasonErrFields(ctx, err.Error(), handlers.ErrInternalError)...)
@@ -64,8 +60,6 @@ func (r *withdrawals) Handle(response http.ResponseWriter, request *http.Request
 		}
 	case *handlers.ResultString:
 		response.Header().Set("Content-Type", "application/json")
-		// response.Write([]byte(value.String()))
-		render.Status(request, value.Status())
 		render.Render(response, request, model.NewEmptyList())
 		return
 	}

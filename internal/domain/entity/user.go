@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 17:46 by Victor N. Skurikhin.
  * user.go
  * $Id$
  */
@@ -32,30 +32,6 @@ func (u *User) Password() *string {
 	return u.password
 }
 
-func (u *User) SetPassword(password *string) {
-	u.password = password
-}
-
-func (u *User) CreatedAt() time.Time {
-	return u.createdAt
-}
-
-func (u *User) UpdateAt() *time.Time {
-	return u.updateAt
-}
-
-func (u *User) Insert(s storage.Storage) (*User, error) {
-	row, err := s.Save(
-		`INSERT INTO "users" (login, password, created_at) VALUES ($1, $2, now()) RETURNING *`,
-		u.login, u.password,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return extractUser(row)
-}
-
 func (u *User) AppendInsertTo(a storage.TxArgs) storage.TxArgs {
 
 	t := storage.NewTxArg(
@@ -63,31 +39,6 @@ func (u *User) AppendInsertTo(a storage.TxArgs) storage.TxArgs {
 		u.login, u.password,
 	)
 	return append(a, t)
-}
-
-func (u *User) Save(s storage.Storage) (*User, error) {
-
-	row, err := s.Save(
-		`INSERT INTO "users" (login, password, created_at)
-             VALUES ($1, $2, now())
-             ON CONFLICT (login)
-             DO UPDATE SET
-               password = $2
-             RETURNING *`,
-		u.login, u.password,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return extractUser(row)
-}
-
-func FuncGetAllUsers() func(storage.Storage) ([]*User, error) {
-	return func(s storage.Storage) ([]*User, error) {
-		result := make([]*User, 0)
-		return result, nil
-	}
 }
 
 func FuncGetUser() func(storage.Storage, string) (*User, error) {
@@ -101,18 +52,7 @@ func FuncGetUser() func(storage.Storage, string) (*User, error) {
 			return nil, err
 		}
 
-		pLogin, pPassword, pCreatedAt, pUpdateAt, err := extractUserTuple(row)
-
-		if err != nil {
-			return nil, err
-		}
-
-		return &User{
-			login:     *pLogin,
-			password:  pPassword,
-			createdAt: *pCreatedAt,
-			updateAt:  pUpdateAt,
-		}, nil
+		return extractUser(row)
 	}
 }
 

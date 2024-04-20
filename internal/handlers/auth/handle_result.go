@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 21:44 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-20 18:04 by Victor N. Skurikhin.
  * handle_result.go
  * $Id$
  */
@@ -27,6 +27,7 @@ func newHandleResult(response http.ResponseWriter, request *http.Request) *handl
 	return &handleResult{log: logger.Get(), response: response, request: request}
 }
 
+//goland:noinspection GoUnhandledErrorResult
 func (h *handleResult) handleUser(msg string, resultFunc func(ctx context.Context, user *model.User) handlers.Result) {
 
 	ctx := h.request.Context()
@@ -36,28 +37,23 @@ func (h *handleResult) handleUser(msg string, resultFunc func(ctx context.Contex
 
 		h.log.Debug(msg, utils.LogCtxRecoverFields(ctx, err)...)
 		render.Status(h.request, http.StatusBadRequest)
-		//goland:noinspection GoUnhandledErrorResult
 		render.Render(h.response, h.request, model.Error(handlers.ErrBadRequest))
 
 		return
 	}
 
 	result := resultFunc(ctx, user)
+	render.Status(h.request, result.Status())
 
 	switch value := result.(type) {
 	case *handlers.ResultError:
-
-		render.Status(h.request, result.Status())
-		//goland:noinspection GoUnhandledErrorResult
 		render.Render(h.response, h.request, model.Error(value.Error()))
-
 	case *handlers.ResultString:
 
 		http.SetCookie(h.response, utils.NewCookie(value.String()))
 
 		h.response.Header().Set("Content-Type", "application/json")
 		if err := user.MarshalToWriter(h.response); err == nil {
-			render.Status(h.request, result.Status())
 			return
 		}
 	}
