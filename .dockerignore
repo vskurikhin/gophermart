@@ -1,0 +1,3 @@
+*
+cmd/gophermart/*.go
+!cmd/*
