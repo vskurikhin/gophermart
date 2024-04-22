@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:46 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-21 00:49 by Victor N. Skurikhin.
  * order.go
  * $Id$
  */
@@ -96,7 +96,7 @@ func (o *Order) AppendSetStatusTo(a storage.TxArgs, status string) storage.TxArg
 func FuncGetOrderByNumber() func(storage.Storage, string) (*Order, error) {
 	return func(s storage.Storage, number string) (*Order, error) {
 
-		row, err := s.GetByNumber(
+		row, err := s.GetByString(
 			`SELECT * FROM "orders" WHERE number = $1`,
 			number,
 		)

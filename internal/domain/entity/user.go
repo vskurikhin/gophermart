@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:46 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-21 00:49 by Victor N. Skurikhin.
  * user.go
  * $Id$
  */
@@ -44,7 +44,7 @@ func (u *User) AppendInsertTo(a storage.TxArgs) storage.TxArgs {
 func FuncGetUser() func(storage.Storage, string) (*User, error) {
 	return func(s storage.Storage, login string) (*User, error) {
 
-		row, err := s.GetByLogin(
+		row, err := s.GetByString(
 			`SELECT * FROM "users" WHERE login = $1`,
 			login,
 		)

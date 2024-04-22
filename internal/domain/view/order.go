@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 18:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-21 00:49 by Victor N. Skurikhin.
  * order.go
  * $Id$
  */
@@ -43,7 +43,7 @@ func (o *Order) UploadedAt() *time.Time {
 func FuncGetAllOrdersForLogin() func(storage.Storage, string) ([]*Order, error) {
 	return func(s storage.Storage, login string) ([]*Order, error) {
 
-		rows, err := s.GetAllForLogin(
+		rows, err := s.GetAllForString(
 			`SELECT o.*, s.status FROM "orders" o JOIN status s ON o.status_id = s.id  WHERE login = $1`,
 			login,
 		)
@@ -64,7 +64,7 @@ func FuncGetAllOrdersForLogin() func(storage.Storage, string) ([]*Order, error) 
 
 func extractOrder(row pgx.Row) (*Order, error) {
 
-	pLogin, pNumber, status, pAccrual, pUploadedAt, pCreatedAt, pUpdateAt, err := extractOrderTuple(row)
+	pLogin, pNumber, pAccrual, pUploadedAt, pCreatedAt, pUpdateAt, status, err := extractOrderTuple(row)
 
 	if err != nil {
 		return nil, err
@@ -81,7 +81,7 @@ func extractOrder(row pgx.Row) (*Order, error) {
 	}, nil
 }
 
-func extractOrderTuple(row pgx.Row) (*string, *string, string, *big.Float, *time.Time, *time.Time, *time.Time, error) {
+func extractOrderTuple(row pgx.Row) (*string, *string, *big.Float, *time.Time, *time.Time, *time.Time, string, error) {
 
 	var statusID int
 	var login, number, status string
@@ -94,7 +94,7 @@ func extractOrderTuple(row pgx.Row) (*string, *string, string, *big.Float, *time
 	)
 
 	if err != nil {
-		return nil, nil, status, nil, nil, nil, nil, err
+		return nil, nil, nil, nil, nil, nil, status, err
 	}
 	var uploadedAt *time.Time
 
@@ -113,8 +113,8 @@ func extractOrderTuple(row pgx.Row) (*string, *string, string, *big.Float, *time
 		accrual, ok = new(big.Float).SetString(accrualNullString.String)
 	}
 	if !ok {
-		return &login, &number, status, nil, uploadedAt, &createdAt, updateAt, err
+		return &login, &number, nil, uploadedAt, &createdAt, updateAt, status, err
 	}
 
-	return &login, &number, status, accrual, uploadedAt, &createdAt, updateAt, err
+	return &login, &number, accrual, uploadedAt, &createdAt, updateAt, status, err
 }

@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:58 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-21 00:49 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -75,7 +75,7 @@ func (b *Balance) AppendWithdrawTo(a storage.TxArgs, sum *big.Float) storage.TxA
 func FuncGetBalance() func(storage.Storage, string) (*Balance, error) {
 	return func(s storage.Storage, login string) (*Balance, error) {
 
-		row, err := s.GetByLogin("SELECT * FROM balance WHERE login = $1", login)
+		row, err := s.GetByString("SELECT * FROM balance WHERE login = $1", login)
 
 		if err != nil {
 			return nil, err
