@@ -1,6 +1,6 @@
 /*
- * This file was last modified at 2024-04-15 11:39 by Victor N. Skurikhin.
- * mock_config.go
+ * This file was last modified at 2024-04-21 00:49 by Victor N. Skurikhin.
+ * mock_config_test.go
  * $Id$
  */
 

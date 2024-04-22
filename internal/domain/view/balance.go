@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:54 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-22 10:40 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -15,8 +15,6 @@ import (
 	"math/big"
 	"time"
 )
-
-var zero = big.NewFloat(0.0)
 
 type Balance struct {
 	login     string
@@ -38,7 +36,7 @@ func (b *Balance) Sum() big.Float {
 func FuncGetBalanceWithdraw() func(storage.Storage, string) (*Balance, error) {
 	return func(s storage.Storage, login string) (*Balance, error) {
 
-		row, err := s.GetByLogin(
+		row, err := s.GetByString(
 			`SELECT *, (SELECT sum(sum) FROM withdraw WHERE login = $1) FROM "balance" WHERE login = $1`,
 			login,
 		)
@@ -50,7 +48,7 @@ func FuncGetBalanceWithdraw() func(storage.Storage, string) (*Balance, error) {
 		_, pCurrent, pWithdrawn, pCreatedAt, pUpdateAt, pSum, err := extractBalanceWithdrawn(row)
 
 		if utils.IsErrNoRowsInResultSet(err) {
-			return &Balance{login: login, current: *zero}, err
+			return &Balance{login: login, current: utils.BigFloatWith0()}, err
 		} else if err != nil {
 			return nil, err
 		}
@@ -94,13 +92,14 @@ func extractBalanceWithdrawn(row pgx.Row) (*string, *big.Float, *big.Float, *tim
 	if updateAtNullTime.Valid {
 		updateAt = &updateAtNullTime.Time
 	}
+	bigFloatZero := utils.BigFloatWith0()
 	if sumNull.Valid {
 		sum, ok = new(big.Float).SetString(sumNull.String)
 	} else {
-		sum = zero
+		sum = &bigFloatZero
 	}
 	if !ok {
-		return &login, balance, withdrawn, &createdAt, updateAt, zero, nil
+		return &login, balance, withdrawn, &createdAt, updateAt, &bigFloatZero, nil
 	}
 	return &login, balance, withdrawn, &createdAt, updateAt, sum, err
 }
