@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-22 10:40 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-22 10:44 by Victor N. Skurikhin.
  * withdraw_test.go
  * $Id$
  */
@@ -41,7 +41,7 @@ func TestWithdrawPositive(t *testing.T) {
 
 				rows := utils.PgxRowsNext(
 					withdrawColumns, "test", utils.StringZero, utils.StringZero, 0,
-					utils.SqlNullTimeZero(), utils.TimeZero(), utils.SqlNullTimeZero(),
+					utils.SQLNullTimeZero(), utils.TimeZero(), utils.SQLNullTimeZero(),
 				)
 				return extractWithdraw(rows)
 			},
@@ -75,7 +75,7 @@ func TestWithdrawNegative(t *testing.T) {
 			get: func() (interface{}, error) {
 				rows := utils.PgxRowsNext(
 					withdrawColumns, "test", utils.StringZero, "", 0,
-					utils.SqlNullTimeZero(), utils.TimeZero(), utils.SqlNullTimeZero(),
+					utils.SQLNullTimeZero(), utils.TimeZero(), utils.SQLNullTimeZero(),
 				)
 				return extractWithdraw(rows)
 			},

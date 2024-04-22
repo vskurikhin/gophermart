@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-22 10:40 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-22 10:44 by Victor N. Skurikhin.
  * order_test.go
  * $Id$
  */
@@ -31,8 +31,8 @@ func TestOrderPositive(t *testing.T) {
 
 				columns := []string{"login", "number", "status_id", "accrual", "uploaded_at", "created_at", "update_at", "status"}
 				rows := utils.PgxRowsNext(
-					columns, "test", utils.StringZero, 0, utils.SqlNullStringWith0(),
-					utils.SqlNullTimeZero(), utils.TimeZero(), utils.SqlNullTimeZero(), "NEW",
+					columns, "test", utils.StringZero, 0, utils.SQLNullStringWith0(),
+					utils.SQLNullTimeZero(), utils.TimeZero(), utils.SQLNullTimeZero(), "NEW",
 				)
 				return extractOrder(rows)
 			},
@@ -49,8 +49,8 @@ func TestOrderPositive(t *testing.T) {
 
 				columns := []string{"login", "number", "status_id", "accrual", "uploaded_at", "created_at", "update_at", "status"}
 				rows := utils.PgxRowsNext(
-					columns, "test", utils.StringZero, 0, utils.SqlNullStringZero(),
-					utils.SqlNullTimeZero(), utils.TimeZero(), utils.SqlNullTimeZero(), "NEW",
+					columns, "test", utils.StringZero, 0, utils.SQLNullStringZero(),
+					utils.SQLNullTimeZero(), utils.TimeZero(), utils.SQLNullTimeZero(), "NEW",
 				)
 				return extractOrder(rows)
 			},

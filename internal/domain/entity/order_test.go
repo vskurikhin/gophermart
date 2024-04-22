@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-22 10:40 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-22 10:44 by Victor N. Skurikhin.
  * order_test.go
  * $Id$
  */
@@ -44,8 +44,8 @@ func TestOrderPositive(t *testing.T) {
 				assert.True(t, len(a) == 2)
 
 				rows := utils.PgxRowsNext(
-					orderColumns, "test", utils.StringZero, 0, utils.SqlNullStringWith0(),
-					utils.SqlNullTimeZero(), utils.TimeZero(), utils.SqlNullTimeZero(),
+					orderColumns, "test", utils.StringZero, 0, utils.SQLNullStringWith0(),
+					utils.SQLNullTimeZero(), utils.TimeZero(), utils.SQLNullTimeZero(),
 				)
 				return extractOrder(rows)
 			},
@@ -54,8 +54,8 @@ func TestOrderPositive(t *testing.T) {
 			name: "Test positive #2 Order",
 			get: func() (interface{}, error) {
 				rows := utils.PgxRowsNext(
-					orderColumns, "test", "", 0, utils.SqlNullStringWith0(),
-					utils.SqlNullTimeZero(), utils.TimeZero(), utils.SqlNullTimeZero(),
+					orderColumns, "test", "", 0, utils.SQLNullStringWith0(),
+					utils.SQLNullTimeZero(), utils.TimeZero(), utils.SQLNullTimeZero(),
 				)
 				return extractOrder(rows)
 			},
@@ -64,8 +64,8 @@ func TestOrderPositive(t *testing.T) {
 			name: "Test positive #3 Order",
 			get: func() (interface{}, error) {
 				rows := utils.PgxRowsNext(
-					orderColumns, "test", utils.StringZero, 0, utils.SqlNullStringZero(),
-					utils.SqlNullTimeZero(), utils.TimeZero(), utils.SqlNullTimeZero(),
+					orderColumns, "test", utils.StringZero, 0, utils.SQLNullStringZero(),
+					utils.SQLNullTimeZero(), utils.TimeZero(), utils.SQLNullTimeZero(),
 				)
 				return extractOrder(rows)
 			},

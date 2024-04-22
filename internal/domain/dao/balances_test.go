@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-22 10:40 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-22 10:44 by Victor N. Skurikhin.
  * balances_test.go
  * $Id$
  */
@@ -28,7 +28,7 @@ func TestDaoBalances(t *testing.T) {
 			get: func() (interface{}, error) {
 				columns := []string{"login", "current", "withdrawn", "created_at", "update_at"}
 				m := MockStorageGetByString(
-					ctrl, columns, "test", utils.StringZero, utils.StringZero, utils.TimeZero(), utils.SqlNullTimeNull(),
+					ctrl, columns, "test", utils.StringZero, utils.StringZero, utils.TimeZero(), utils.SQLNullTimeNull(),
 				)
 				db := Balances(m)
 				return db.GetBalance("test")
@@ -40,7 +40,7 @@ func TestDaoBalances(t *testing.T) {
 				columns := []string{"login", "current", "withdrawn", "created_at", "update_at", "sum"}
 				m := MockStorageGetByString(
 					ctrl, columns, "test", utils.StringZero, utils.StringZero,
-					utils.TimeZero(), utils.SqlNullTimeNull(), utils.SqlNullStringNull(),
+					utils.TimeZero(), utils.SQLNullTimeNull(), utils.SQLNullStringNull(),
 				)
 				db := Balances(m)
 				return db.GetBalanceWithdraw("test")

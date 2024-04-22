@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-22 10:40 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-22 10:44 by Victor N. Skurikhin.
  * consts.go
  * $Id$
  */
@@ -40,22 +40,22 @@ func BigIntWith0() big.Int {
 	return bigIntZero
 }
 
-func SqlNullStringNull() sql.NullString {
+func SQLNullStringNull() sql.NullString {
 	return sql.NullString{}
 }
 
-func SqlNullStringZero() sql.NullString {
+func SQLNullStringZero() sql.NullString {
 	return sql.NullString{Valid: true}
 }
-func SqlNullStringWith0() sql.NullString {
+func SQLNullStringWith0() sql.NullString {
 	return sql.NullString{String: StringZero, Valid: true}
 }
 
-func SqlNullTimeNull() sql.NullTime {
+func SQLNullTimeNull() sql.NullTime {
 	return sql.NullTime{}
 }
 
-func SqlNullTimeZero() sql.NullTime {
+func SQLNullTimeZero() sql.NullTime {
 	return sql.NullTime{Valid: true}
 }
 

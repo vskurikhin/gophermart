@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-22 10:40 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-22 10:44 by Victor N. Skurikhin.
  * balance_test.go
  * $Id$
  */
@@ -47,7 +47,7 @@ func TestBalancePositive(t *testing.T) {
 
 				columns := []string{"login", "current", "withdrawn", "created_at", "update_at"}
 				rows := utils.PgxRowsNext(
-					columns, "test", utils.StringZero, utils.StringZero, utils.TimeZero(), utils.SqlNullTimeZero(),
+					columns, "test", utils.StringZero, utils.StringZero, utils.TimeZero(), utils.SQLNullTimeZero(),
 				)
 				_, _, _, _, _, err := extractBalance(rows)
 				return b, err
@@ -83,7 +83,7 @@ func TestBalanceNegative(t *testing.T) {
 			get: func() (interface{}, error) {
 				columns := []string{"login", "current", "withdrawn", "created_at", "update_at"}
 				rows := utils.PgxRowsNext(
-					columns, "test", "", utils.StringZero, utils.TimeZero(), utils.SqlNullTimeNull(),
+					columns, "test", "", utils.StringZero, utils.TimeZero(), utils.SQLNullTimeNull(),
 				)
 				_, _, _, _, _, err := extractBalance(rows)
 				return nil, err
@@ -94,7 +94,7 @@ func TestBalanceNegative(t *testing.T) {
 			get: func() (interface{}, error) {
 				columns := []string{"login", "current", "withdrawn", "created_at", "update_at"}
 				rows := utils.PgxRowsNext(
-					columns, "test", utils.StringZero, "", utils.TimeZero(), utils.SqlNullTimeNull(),
+					columns, "test", utils.StringZero, "", utils.TimeZero(), utils.SQLNullTimeNull(),
 				)
 				_, _, _, _, _, err := extractBalance(rows)
 				return nil, err

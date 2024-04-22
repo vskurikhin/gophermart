@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-22 10:40 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-22 10:44 by Victor N. Skurikhin.
  * user_test.go
  * $Id$
  */
@@ -38,7 +38,7 @@ func TestUserPositive(t *testing.T) {
 				assert.True(t, len(a) == 1)
 
 				rows := utils.PgxRowsNext(
-					userColumns, "test", utils.SqlNullStringZero(), utils.TimeZero(), utils.SqlNullTimeZero(),
+					userColumns, "test", utils.SQLNullStringZero(), utils.TimeZero(), utils.SQLNullTimeZero(),
 				)
 				return extractUser(rows)
 			},

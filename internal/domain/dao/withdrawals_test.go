@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-22 10:40 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-22 10:44 by Victor N. Skurikhin.
  * withdrawals_test.go
  * $Id$
  */
@@ -30,7 +30,7 @@ func TestDaoWithdrawals(t *testing.T) {
 				columns := []string{"login", "number", "sum", "status_id", "processed_at", "created_at", "update_at"}
 				m := MockStorageGetAllForString(
 					ctrl, columns, "test", utils.StringZero, utils.StringZero, 0,
-					utils.SqlNullTimeNull(), utils.TimeZero(), utils.SqlNullTimeNull(),
+					utils.SQLNullTimeNull(), utils.TimeZero(), utils.SQLNullTimeNull(),
 				)
 				dw := Withdrawals(m)
 				dw.GetAllWithdrawalsByLogin("test")

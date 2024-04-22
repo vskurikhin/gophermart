@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-22 10:40 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-22 10:44 by Victor N. Skurikhin.
  * users_test.go
  * $Id$
  */
@@ -28,7 +28,7 @@ func TestDaoUsers(t *testing.T) {
 			get: func() (interface{}, error) {
 				columns := []string{"login", "password", "created_at", "update_at"}
 				m := MockStorageGetByString(
-					ctrl, columns, "test", utils.SqlNullStringNull(), utils.TimeZero(), utils.SqlNullTimeNull(),
+					ctrl, columns, "test", utils.SQLNullStringNull(), utils.TimeZero(), utils.SQLNullTimeNull(),
 				)
 				du := Users(m)
 				return du.GetUser("test")
