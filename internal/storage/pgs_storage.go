@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-21 00:49 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-25 21:15 by Victor N. Skurikhin.
  * pgs_storage.go
  * $Id$
  */
@@ -40,31 +40,31 @@ func (p *PgsStorage) WithContext(ctx context.Context) Storage {
 	return &PgsStorage{ctx: ctx, log: p.log, pool: p.pool}
 }
 
-func (p *PgsStorage) GetAllForString(sql, str string) (pgx.Rows, error) {
+func (p *PgsStorage) GetAllForString(sql, str string) (Rows, error) {
 	const funcName = "PgsStorage.GetAllForString"
 	defer utils.TraceInOut(p.ctx, funcName, "%s, login", sql, str)()
 	return p.sqlRows(funcName, sql, str)
 }
 
-func (p *PgsStorage) GetByID(sql string, id int) (pgx.Row, error) {
+func (p *PgsStorage) GetByID(sql string, id int) (Row, error) {
 	const funcName = "PgsStorage.GetByID"
 	defer utils.TraceInOut(p.ctx, funcName, "%s, %d", sql, id)()
 	return p.sqlRow(funcName, sql, id)
 }
 
-func (p *PgsStorage) GetByString(sql, str string) (pgx.Row, error) {
+func (p *PgsStorage) GetByString(sql, str string) (Row, error) {
 	const funcName = "PgsStorage.GetByString"
 	defer utils.TraceInOut(p.ctx, funcName, "%s, %s", sql, str)()
 	return p.sqlRow(funcName, sql, str)
 }
 
-func (p *PgsStorage) GetByStr1Str2(sql, str1, str2 string) (pgx.Row, error) {
+func (p *PgsStorage) GetByStr1Str2(sql, str1, str2 string) (Row, error) {
 	const funcName = "PgsStorage.GetByStr1Str2"
 	defer utils.TraceInOut(p.ctx, funcName, "%s, %s, %s", sql, str1, str2)()
 	return p.sqlRow(funcName, sql, str1, str2)
 }
 
-func (p *PgsStorage) Save(sql string, values ...any) (pgx.Row, error) {
+func (p *PgsStorage) Save(sql string, values ...any) (Row, error) {
 	const funcName = "PgsStorage.Save"
 	defer utils.TraceInOut(p.ctx, funcName, "%s, %s", sql, values)()
 	return p.sqlRow(funcName, sql, values...)

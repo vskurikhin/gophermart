@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 14:40 by Victor N. Skurikhin.
  * order_service.go
  * $Id$
  */
@@ -8,6 +8,7 @@ package orders
 
 import (
 	"context"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/vskurikhin/gophermart/internal/clients/accrual"
@@ -75,7 +76,7 @@ func (s *service) Number(login, number string) handlers.Result {
 		return handlers.ResultInternalError()
 	}
 	jobs := s.workers.Jobs()
-	jobs <- job
+	jobs <- accrual.NewJob(job, middleware.GetReqID(s.ctx))
 
 	return handlers.NewResultString(number, http.StatusAccepted)
 }

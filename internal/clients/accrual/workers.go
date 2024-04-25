@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 14:45 by Victor N. Skurikhin.
  * workers.go
  * $Id$
  */
@@ -17,15 +17,20 @@ import (
 	"sync"
 )
 
+type Job struct {
+	number    int
+	requestID string
+}
+
 type Workers interface {
-	Jobs() chan<- int
+	Jobs() chan<- Job
 }
 
 type workers struct {
-	jobs chan<- int
+	jobs chan<- Job
 }
 
-func (w *workers) Jobs() chan<- int {
+func (w *workers) Jobs() chan<- Job {
 	return w.jobs
 }
 
@@ -36,8 +41,8 @@ func GetWorkers() Workers {
 
 	once.Do(func() {
 		cfg := env.GetConfig()
-		jobs := make(chan int, cfg.RateLimit())
 		log := logger.Get()
+		jobs := make(chan Job, cfg.RateLimit())
 
 		w := new(workers)
 		w.jobs = jobs
@@ -50,22 +55,37 @@ func GetWorkers() Workers {
 	return instance
 }
 
-func worker(log *zap.Logger, w int, jobs <-chan int) {
+func NewJob(number int, requestID string) Job {
+	return Job{number: number, requestID: requestID}
+}
 
-	srv := newService(storage.NewPgsStorage())
+func (j *Job) Number() int {
+	return j.number
+}
 
-	for i := range jobs {
+func (j *Job) RequestID() string {
+	return j.requestID
+}
+
+func worker(log *zap.Logger, w int, jobs <-chan Job) {
+
+	for job := range jobs {
+
+		srv := newService(storage.NewPgsStorage(), job.RequestID())
 
 		log.Debug("jobs",
-			zap.String("number", fmt.Sprintf("%d", i)),
+			zap.String("number", fmt.Sprintf("%d", job.Number())),
 			zap.String("worker", fmt.Sprintf("%d", w)),
 		)
-		err := srv.GetNumber(i)
+		err := srv.GetNumber(job.Number())
 
 		if err != nil {
 			log.Debug(
 				"jobs",
-				utils.LogCtxReasonErrFields(srv.Context(), fmt.Sprintf("number: %d, worker: %d", i, w), err)...,
+				utils.LogCtxReasonErrFields(
+					srv.Context(),
+					fmt.Sprintf("number: %d, worker: %d", job.Number(), w), err,
+				)...,
 			)
 		}
 	}

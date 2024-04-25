@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-22 10:44 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-25 22:06 by Victor N. Skurikhin.
  * balance_test.go
  * $Id$
  */
@@ -33,8 +33,7 @@ func TestBalancePositive(t *testing.T) {
 					columns, "test", utils.StringZero, utils.StringZero,
 					utils.TimeZero(), utils.SQLNullTimeZero(), utils.SQLNullStringWith0(),
 				)
-				_, _, _, _, _, _, err := extractBalanceWithdrawn(rows)
-				return b, err
+				return extractBalanceWithdrawn(rows)
 			},
 		},
 		{
@@ -45,8 +44,7 @@ func TestBalancePositive(t *testing.T) {
 					columns, "test", utils.StringZero, utils.StringZero,
 					utils.TimeZero(), utils.SQLNullTimeZero(), utils.SQLNullStringNull(),
 				)
-				_, _, _, _, _, _, err := extractBalanceWithdrawn(rows)
-				return "ok", err
+				return extractBalanceWithdrawn(rows)
 			},
 		},
 		{
@@ -57,8 +55,7 @@ func TestBalancePositive(t *testing.T) {
 					columns, "test", utils.StringZero, utils.StringZero,
 					utils.TimeZero(), utils.SQLNullTimeZero(), utils.SQLNullStringZero(),
 				)
-				_, _, _, _, _, _, err := extractBalanceWithdrawn(rows)
-				return "ok", err
+				return extractBalanceWithdrawn(rows)
 			},
 		},
 	}
@@ -82,8 +79,7 @@ func TestBalanceNegative(t *testing.T) {
 			name: "Test negative #1 Balance",
 			get: func() (interface{}, error) {
 				rows := &utils.TestRows{}
-				_, _, _, _, _, _, err := extractBalanceWithdrawn(rows)
-				return nil, err
+				return extractBalanceWithdrawn(rows)
 			},
 		},
 		{
@@ -94,8 +90,7 @@ func TestBalanceNegative(t *testing.T) {
 					columns, "test", "", utils.StringZero,
 					utils.TimeZero(), utils.SQLNullTimeZero(), utils.SQLNullStringWith0(),
 				)
-				_, _, _, _, _, _, err := extractBalanceWithdrawn(rows)
-				return nil, err
+				return extractBalanceWithdrawn(rows)
 			},
 		},
 		{
@@ -106,8 +101,7 @@ func TestBalanceNegative(t *testing.T) {
 					columns, "test", utils.StringZero, "",
 					utils.TimeZero(), utils.SQLNullTimeZero(), utils.SQLNullStringWith0(),
 				)
-				_, _, _, _, _, _, err := extractBalanceWithdrawn(rows)
-				return nil, err
+				return extractBalanceWithdrawn(rows)
 			},
 		},
 	}

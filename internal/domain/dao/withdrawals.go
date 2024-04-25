@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:46 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-25 21:59 by Victor N. Skurikhin.
  * withdrawals.go
  * $Id$
  */
@@ -20,5 +20,5 @@ func Withdrawals(storage storage.Storage) *withdrawals {
 }
 
 func (w *withdrawals) GetAllWithdrawalsByLogin(login string) ([]*entity.Withdraw, error) {
-	return entity.FuncGetAllWithdrawalsByLogin()(w.storage, login)
+	return entity.GetAllWithdrawalsByLogin(w.storage, login)
 }

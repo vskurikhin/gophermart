@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:46 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-25 21:54 by Victor N. Skurikhin.
  * users.go
  * $Id$
  */
@@ -20,5 +20,5 @@ func Users(storage storage.Storage) *users {
 }
 
 func (u *users) GetUser(login string) (*entity.User, error) {
-	return entity.FuncGetUser()(u.storage, login)
+	return entity.GetUser(u.storage, login)
 }

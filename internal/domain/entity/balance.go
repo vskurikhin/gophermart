@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-21 00:49 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 14:33 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -21,6 +21,18 @@ type Balance struct {
 	withdrawn big.Float
 	createdAt time.Time
 	updateAt  *time.Time
+}
+
+func GetBalance(s storage.Storage, login string) (*Balance, error) {
+
+	row, err := s.GetByString(
+		`SELECT login, current, withdrawn, created_at, update_at
+			FROM balance WHERE login = $1`, login,
+	)
+	if err != nil {
+		return nil, err
+	}
+	return extractBalance(row)
 }
 
 func NewBalance(login string, current big.Float) *Balance {
@@ -72,32 +84,7 @@ func (b *Balance) AppendWithdrawTo(a storage.TxArgs, sum *big.Float) storage.TxA
 	return append(a, t)
 }
 
-func FuncGetBalance() func(storage.Storage, string) (*Balance, error) {
-	return func(s storage.Storage, login string) (*Balance, error) {
-
-		row, err := s.GetByString("SELECT * FROM balance WHERE login = $1", login)
-
-		if err != nil {
-			return nil, err
-		}
-
-		_, pCurrent, pWithdrawn, pCreatedAt, pUpdateAt, err := extractBalance(row)
-
-		if err != nil {
-			return nil, err
-		}
-
-		return &Balance{
-			login:     login,
-			current:   *pCurrent,
-			withdrawn: *pWithdrawn,
-			createdAt: *pCreatedAt,
-			updateAt:  pUpdateAt,
-		}, nil
-	}
-}
-
-func extractBalance(row pgx.Row) (*string, *big.Float, *big.Float, *time.Time, *time.Time, error) {
+func extractBalance(row pgx.Row) (*Balance, error) {
 
 	var login, sCurrent, sWithdrawn string
 	var createdAt time.Time
@@ -106,22 +93,28 @@ func extractBalance(row pgx.Row) (*string, *big.Float, *big.Float, *time.Time, *
 	err := row.Scan(&login, &sCurrent, &sWithdrawn, &createdAt, &updateAtNullTime)
 
 	if err != nil {
-		return nil, nil, nil, nil, nil, err
+		return nil, err
 	}
 	balance, ok := new(big.Float).SetString(sCurrent)
 
 	if !ok {
-		return nil, nil, nil, nil, nil, errors.New("can't read current")
+		return nil, errors.New("can't read current")
 	}
 	withdrawn, ok := new(big.Float).SetString(sWithdrawn)
 
 	if !ok {
-		return nil, nil, nil, nil, nil, errors.New("can't read withdrawn")
+		return nil, errors.New("can't read withdrawn")
 	}
 	var updateAt *time.Time
 
 	if updateAtNullTime.Valid {
 		updateAt = &updateAtNullTime.Time
 	}
-	return &login, balance, withdrawn, &createdAt, updateAt, err
+	return &Balance{
+		login:     login,
+		current:   *balance,
+		withdrawn: *withdrawn,
+		createdAt: createdAt,
+		updateAt:  updateAt,
+	}, nil
 }
