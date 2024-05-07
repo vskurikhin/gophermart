@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 00:15 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 17:36 by Victor N. Skurikhin.
  * withdraw.go
  * $Id$
  */
@@ -13,9 +13,9 @@ import (
 )
 
 type Withdraw struct {
-	Order       string `json:"order"`
-	Sum         Float  `json:"sum"`
-	ProcessedAt *Time  `json:"processed_at,omitempty"`
+	Order       string `json:"order" example:"2377225624"`
+	Sum         Float  `json:"sum" example:"751"`
+	ProcessedAt *Time  `json:"processed_at,omitempty" example:"2020-12-09T16:09:57+03:00"`
 }
 
 func NewWithdraw(order string, sum *big.Float) *Withdraw {

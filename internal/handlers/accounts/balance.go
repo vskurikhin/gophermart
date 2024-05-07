@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 18:06 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 17:40 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -28,6 +28,19 @@ func newBalance() *balance {
 	return &balance{log: logger.Get()}
 }
 
+// Handle balance
+//
+//	@Summary		баланс
+//	@Description	получение текущего баланса пользователя
+//	@Tags			Account
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Success		200	{object}	model.Balance	"успешная обработка запроса"
+//	@Failure		401	{object}	model.JSONError	"пользователь не аутентифицирован"
+//	@Failure		500	{string}	string			"Internal Server Error"
+//	@Router			/user/balance/withdraw [get]
+//
 //goland:noinspection GoUnhandledErrorResult
 func (r *balance) Handle(response http.ResponseWriter, request *http.Request) {
 

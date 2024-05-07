@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 20:15 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 17:21 by Victor N. Skurikhin.
  * login.go
  * $Id$
  */
@@ -28,6 +28,20 @@ func newLogin() *login {
 	return &login{log: logger.Get()}
 }
 
+// Handle login
+//
+//	@Summary		аутентификация
+//	@Description	аутентификация пользователя
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Security		none
+//	@Param			request			body		model.User		true	"Формат запроса JSON (body)"
+//	@Success		200				{object}	model.User		"пользователь успешно аутентифицирован"
+//	@Failure		400				{object}	model.JSONError	"неверный формат запроса"
+//	@Failure		401				{object}	model.JSONError	"неверная пара логин/пароль"
+//	@Failure		500				{string}	string			"Internal Server Error"
+//	@Router			/user/login 	[post]
 func (l *login) Handle(response http.ResponseWriter, request *http.Request) {
 
 	hr := newHandleResult(response, request)

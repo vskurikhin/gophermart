@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 14:00 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 16:32 by Victor N. Skurikhin.
  * error_easyjson.go
  * $Id$
  */
@@ -23,7 +23,7 @@ var (
 	_ easyjson.Marshaler
 )
 
-func easyjsonE34310f8DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer.Lexer, out *rError) {
+func easyjsonE34310f8DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer.Lexer, out *JSONError) {
 	isTopLevel := in.IsStart()
 	if in.IsNull() {
 		if isTopLevel {
@@ -54,7 +54,7 @@ func easyjsonE34310f8DecodeGithubComVskurikhinGophermartInternalModel(in *jlexer
 		in.Consumed()
 	}
 }
-func easyjsonE34310f8EncodeGithubComVskurikhinGophermartInternalModel(out *jwriter.Writer, in rError) {
+func easyjsonE34310f8EncodeGithubComVskurikhinGophermartInternalModel(out *jwriter.Writer, in JSONError) {
 	out.RawByte('{')
 	first := true
 	_ = first
@@ -67,25 +67,25 @@ func easyjsonE34310f8EncodeGithubComVskurikhinGophermartInternalModel(out *jwrit
 }
 
 // MarshalJSON supports json.Marshaler interface
-func (v rError) MarshalJSON() ([]byte, error) {
+func (v JSONError) MarshalJSON() ([]byte, error) {
 	w := jwriter.Writer{}
 	easyjsonE34310f8EncodeGithubComVskurikhinGophermartInternalModel(&w, v)
 	return w.Buffer.BuildBytes(), w.Error
 }
 
 // MarshalEasyJSON supports easyjson.Marshaler interface
-func (v rError) MarshalEasyJSON(w *jwriter.Writer) {
+func (v JSONError) MarshalEasyJSON(w *jwriter.Writer) {
 	easyjsonE34310f8EncodeGithubComVskurikhinGophermartInternalModel(w, v)
 }
 
 // UnmarshalJSON supports json.Unmarshaler interface
-func (v *rError) UnmarshalJSON(data []byte) error {
+func (v *JSONError) UnmarshalJSON(data []byte) error {
 	r := jlexer.Lexer{Data: data}
 	easyjsonE34310f8DecodeGithubComVskurikhinGophermartInternalModel(&r, v)
 	return r.Error()
 }
 
 // UnmarshalEasyJSON supports easyjson.Unmarshaler interface
-func (v *rError) UnmarshalEasyJSON(l *jlexer.Lexer) {
+func (v *JSONError) UnmarshalEasyJSON(l *jlexer.Lexer) {
 	easyjsonE34310f8DecodeGithubComVskurikhinGophermartInternalModel(l, v)
 }

@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-15 14:12 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 16:32 by Victor N. Skurikhin.
  * error.go
  * $Id$
  */
@@ -10,16 +10,16 @@ import (
 	"net/http"
 )
 
-type rError struct {
+type JSONError struct {
 	Error string `json:"error"`
 }
 
-func Error(err error) *rError {
-	return &rError{
+func Error(err error) *JSONError {
+	return &JSONError{
 		Error: err.Error(),
 	}
 }
 
-func (e *rError) Render(w http.ResponseWriter, r *http.Request) error {
+func (e *JSONError) Render(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }

@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 20:15 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 17:40 by Victor N. Skurikhin.
  * register.go
  * $Id$
  */
@@ -26,6 +26,19 @@ func newRegister() *register {
 	return &register{log: logger.Get()}
 }
 
+// Handle register
+//
+//	@Summary		регистрация
+//	@Description	регистрация пользователя
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			request			body		model.User		true	"Формат запроса JSON (body)"
+//	@Success		200				{object}	model.User		"пользователь успешно зарегистрирован и аутентифицирован"
+//	@Failure		400				{object}	model.JSONError	"неверный формат запроса"
+//	@Failure		409				{object}	model.JSONError	"логин уже занят"
+//	@Failure		500				{string}	string			"Internal Server Error"
+//	@Router			/user/register 																								[post]
 func (r *register) Handle(response http.ResponseWriter, request *http.Request) {
 
 	hr := newHandleResult(response, request)

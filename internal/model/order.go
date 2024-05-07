@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 17:07 by Victor N. Skurikhin.
  * order.go
  * $Id$
  */
@@ -12,10 +12,10 @@ import (
 )
 
 type Order struct {
-	Number     string `json:"number"`
-	Status     string `json:"status"`
-	Accrual    *Float `json:"accrual,omitempty"`
-	UploadedAt Time   `json:"uploaded_at"`
+	Number     string `json:"number" example:"9278923470"`
+	Status     string `json:"status" example:"PROCESSED"`
+	Accrual    *Float `json:"accrual,omitempty" example:"500"`
+	UploadedAt Time   `json:"uploaded_at" example:"2020-12-10T15:15:45+03:00"`
 }
 
 func (o *Order) MarshalToWriter(writer io.Writer) error {
