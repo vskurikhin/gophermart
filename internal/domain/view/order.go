@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-21 00:49 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 12:48 by Victor N. Skurikhin.
  * order.go
  * $Id$
  */
@@ -24,6 +24,26 @@ type Order struct {
 	updateAt   *time.Time
 }
 
+func GetAllOrdersForLogin(s storage.Storage, login string) ([]*Order, error) {
+
+	rows, err := s.GetAllForString(
+		`SELECT o.login, o.number, o.accrual, o.uploaded_at, o.created_at, o.update_at, s.status
+			FROM "orders" o JOIN status s ON o.status_id = s.id  WHERE login = $1`, login,
+	)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*Order, 0)
+	for rows.Next() {
+		order, err := extractOrder(rows)
+		if err != nil {
+			return result, err
+		}
+		result = append(result, order)
+	}
+	return result, nil
+}
+
 func (o *Order) Number() string {
 	return o.number
 }
@@ -40,61 +60,19 @@ func (o *Order) UploadedAt() *time.Time {
 	return o.uploadedAt
 }
 
-func FuncGetAllOrdersForLogin() func(storage.Storage, string) ([]*Order, error) {
-	return func(s storage.Storage, login string) ([]*Order, error) {
-
-		rows, err := s.GetAllForString(
-			`SELECT o.*, s.status FROM "orders" o JOIN status s ON o.status_id = s.id  WHERE login = $1`,
-			login,
-		)
-		if err != nil {
-			return nil, err
-		}
-		result := make([]*Order, 0)
-		for rows.Next() {
-			order, err := extractOrder(rows)
-			if err != nil {
-				return result, err
-			}
-			result = append(result, order)
-		}
-		return result, nil
-	}
-}
-
 func extractOrder(row pgx.Row) (*Order, error) {
 
-	pLogin, pNumber, pAccrual, pUploadedAt, pCreatedAt, pUpdateAt, status, err := extractOrderTuple(row)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &Order{
-		login:      *pLogin,
-		number:     *pNumber,
-		status:     status,
-		accrual:    pAccrual,
-		uploadedAt: pUploadedAt,
-		createdAt:  *pCreatedAt,
-		updateAt:   pUpdateAt,
-	}, nil
-}
-
-func extractOrderTuple(row pgx.Row) (*string, *string, *big.Float, *time.Time, *time.Time, *time.Time, string, error) {
-
-	var statusID int
 	var login, number, status string
 	var createdAt time.Time
 	var accrualNullString sql.NullString
 	var uploadedAtNullTime, updateAtNullTime sql.NullTime
 
 	err := row.Scan(
-		&login, &number, &statusID, &accrualNullString, &uploadedAtNullTime, &createdAt, &updateAtNullTime, &status,
+		&login, &number, &accrualNullString, &uploadedAtNullTime, &createdAt, &updateAtNullTime, &status,
 	)
 
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, status, err
+		return nil, err
 	}
 	var uploadedAt *time.Time
 
@@ -113,8 +91,23 @@ func extractOrderTuple(row pgx.Row) (*string, *string, *big.Float, *time.Time, *
 		accrual, ok = new(big.Float).SetString(accrualNullString.String)
 	}
 	if !ok {
-		return &login, &number, nil, uploadedAt, &createdAt, updateAt, status, err
+		return &Order{
+			login:      login,
+			number:     number,
+			status:     status,
+			accrual:    nil,
+			uploadedAt: uploadedAt,
+			createdAt:  createdAt,
+			updateAt:   updateAt,
+		}, nil
 	}
-
-	return &login, &number, accrual, uploadedAt, &createdAt, updateAt, status, err
+	return &Order{
+		login:      login,
+		number:     number,
+		status:     status,
+		accrual:    accrual,
+		uploadedAt: uploadedAt,
+		createdAt:  createdAt,
+		updateAt:   updateAt,
+	}, nil
 }

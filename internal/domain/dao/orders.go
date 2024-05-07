@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:46 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-25 22:11 by Victor N. Skurikhin.
  * orders.go
  * $Id$
  */
@@ -21,11 +21,11 @@ func Orders(storage storage.Storage) *orders {
 }
 
 func (o *orders) GetAllOrdersForLogin(login string) ([]*view.Order, error) {
-	return view.FuncGetAllOrdersForLogin()(o.storage, login)
+	return view.GetAllOrdersForLogin(o.storage, login)
 }
 
 func (o *orders) GetOrderByNumber(number string) (*entity.Order, error) {
-	return entity.FuncGetOrderByNumber()(o.storage, number)
+	return entity.GetOrderByNumber(o.storage, number)
 }
 
 func (o *orders) Insert(order *entity.Order) (*entity.Order, error) {

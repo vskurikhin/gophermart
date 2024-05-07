@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-21 00:49 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-25 22:07 by Victor N. Skurikhin.
  * user.go
  * $Id$
  */
@@ -18,6 +18,20 @@ type User struct {
 	password  *string
 	createdAt time.Time
 	updateAt  *time.Time
+}
+
+func GetUser(s storage.Storage, login string) (*User, error) {
+
+	row, err := s.GetByString(
+		`SELECT login, password, created_at, update_at
+			FROM "users" WHERE login = $1`,
+		login,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return extractUser(row)
 }
 
 func NewUser(login string, password *string) *User {
@@ -41,37 +55,7 @@ func (u *User) AppendInsertTo(a storage.TxArgs) storage.TxArgs {
 	return append(a, t)
 }
 
-func FuncGetUser() func(storage.Storage, string) (*User, error) {
-	return func(s storage.Storage, login string) (*User, error) {
-
-		row, err := s.GetByString(
-			`SELECT * FROM "users" WHERE login = $1`,
-			login,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		return extractUser(row)
-	}
-}
-
 func extractUser(row pgx.Row) (*User, error) {
-	pLogin, pPassword, pCreatedAt, pUpdateAt, err := extractUserTuple(row)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return &User{
-		login:     *pLogin,
-		password:  pPassword,
-		createdAt: *pCreatedAt,
-		updateAt:  pUpdateAt,
-	}, nil
-}
-
-func extractUserTuple(row pgx.Row) (*string, *string, *time.Time, *time.Time, error) {
 
 	var login string
 	var password *string
@@ -82,7 +66,7 @@ func extractUserTuple(row pgx.Row) (*string, *string, *time.Time, *time.Time, er
 	err := row.Scan(&login, &passwordNull, &createdAt, &updateAtNullTime)
 
 	if err != nil {
-		return nil, nil, nil, nil, err
+		return nil, err
 	}
 	var updateAt *time.Time
 
@@ -92,5 +76,10 @@ func extractUserTuple(row pgx.Row) (*string, *string, *time.Time, *time.Time, er
 	if updateAtNullTime.Valid {
 		updateAt = &updateAtNullTime.Time
 	}
-	return &login, password, &createdAt, updateAt, err
+	return &User{
+		login:     login,
+		password:  password,
+		createdAt: createdAt,
+		updateAt:  updateAt,
+	}, nil
 }

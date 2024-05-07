@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-22 10:44 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-25 21:40 by Victor N. Skurikhin.
  * balance_test.go
  * $Id$
  */
@@ -49,8 +49,7 @@ func TestBalancePositive(t *testing.T) {
 				rows := utils.PgxRowsNext(
 					columns, "test", utils.StringZero, utils.StringZero, utils.TimeZero(), utils.SQLNullTimeZero(),
 				)
-				_, _, _, _, _, err := extractBalance(rows)
-				return b, err
+				return extractBalance(rows)
 			},
 		},
 	}
@@ -74,7 +73,7 @@ func TestBalanceNegative(t *testing.T) {
 			name: "Test negative #1 Balance",
 			get: func() (interface{}, error) {
 				rows := &utils.TestRows{}
-				_, _, _, _, _, err := extractBalance(rows)
+				_, err := extractBalance(rows)
 				return nil, err
 			},
 		},
@@ -85,8 +84,7 @@ func TestBalanceNegative(t *testing.T) {
 				rows := utils.PgxRowsNext(
 					columns, "test", "", utils.StringZero, utils.TimeZero(), utils.SQLNullTimeNull(),
 				)
-				_, _, _, _, _, err := extractBalance(rows)
-				return nil, err
+				return extractBalance(rows)
 			},
 		},
 		{
@@ -96,8 +94,7 @@ func TestBalanceNegative(t *testing.T) {
 				rows := utils.PgxRowsNext(
 					columns, "test", utils.StringZero, "", utils.TimeZero(), utils.SQLNullTimeNull(),
 				)
-				_, _, _, _, _, err := extractBalance(rows)
-				return nil, err
+				return extractBalance(rows)
 			},
 		},
 	}

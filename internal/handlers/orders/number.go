@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 18:03 by Victor N. Skurikhin.
+ * This file was last modified at 2024-04-25 22:23 by Victor N. Skurikhin.
  * number.go
  * $Id$
  */
@@ -34,11 +34,18 @@ func (n *number) Handle(response http.ResponseWriter, request *http.Request) {
 	ctx := request.Context()
 	login, number, err := newRequestOrder(request).LoginNumber()
 
-	if err != nil || login == nil {
+	if err != nil {
 
 		n.log.Debug(numMsg, utils.LogCtxRecoverFields(ctx, err)...)
 		render.Status(request, http.StatusBadRequest)
 		render.Render(response, request, model.Error(handlers.ErrBadRequest))
+
+		return
+	}
+	if login == nil {
+
+		render.Status(request, http.StatusUnauthorized)
+		render.Render(response, request, model.Error(handlers.ErrBadUserPassword))
 
 		return
 	}

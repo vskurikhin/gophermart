@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 17:09 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 14:41 by Victor N. Skurikhin.
  * accrual.go
  * $Id$
  */
@@ -9,6 +9,7 @@ package accrual
 import (
 	"context"
 	"fmt"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/vskurikhin/gophermart/internal/domain/dao"
 	"github.com/vskurikhin/gophermart/internal/domain/transaction"
 	"github.com/vskurikhin/gophermart/internal/env"
@@ -24,8 +25,10 @@ import (
 )
 
 const (
-	increase = 2
-	tries    = 3
+	increase  = 2
+	tries     = 3
+	Invalid   = "INVALID"
+	Processed = "PROCESSED"
 )
 
 type AccrualsService interface {
@@ -41,16 +44,17 @@ type service struct {
 	store   storage.Storage
 }
 
-func newService(store storage.Storage) *service {
+func newService(store storage.Storage, id string) *service {
 
 	cfg := env.GetConfig()
+	ctx := context.WithValue(context.Background(), middleware.RequestIDKey, id)
 
 	return &service{
 		address: cfg.AccrualSystemAddress(),
 		client:  &http.Client{},
-		ctx:     utils.NewIDContext(),
+		ctx:     ctx,
 		log:     logger.Get(),
-		store:   store,
+		store:   store.WithContext(ctx),
 	}
 }
 
@@ -59,6 +63,8 @@ func (s *service) Context() context.Context {
 }
 
 func (s *service) GetNumber(number int) error {
+
+	utils.TraceInOut(s.ctx, "AccrualsService.GetNumber", "%d", number)
 
 	var err error
 	var done bool
@@ -74,6 +80,12 @@ func (s *service) GetNumber(number int) error {
 			return err
 		}
 	}
+	s.log.Info(
+		"GetNumber",
+		zap.String("reqId", middleware.GetReqID(s.ctx)),
+		zap.String("status", "done"),
+		zap.Int("number", number),
+	)
 	return nil
 }
 
@@ -133,7 +145,7 @@ func (s *service) getNumber(number int) (bool, error) {
 			)
 			return false, err
 		}
-		return accrual.Status == "INVALID" || accrual.Status == "PROCESSED", nil
+		return accrual.Status == Invalid || accrual.Status == Processed, nil
 	}
 	return false, handlers.ErrBalanceNotSet
 }
