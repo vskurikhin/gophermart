@@ -1,0 +1,284 @@
+basePath: /api
+definitions:
+  model.Balance:
+    properties:
+      current:
+        example: 500.5
+        type: number
+      withdrawn:
+        example: 42
+        type: number
+    type: object
+  model.Empty:
+    type: object
+  model.JSONError:
+    properties:
+      error:
+        type: string
+    type: object
+  model.Order:
+    properties:
+      accrual:
+        example: 500
+        type: number
+      number:
+        example: "9278923470"
+        type: string
+      status:
+        example: PROCESSED
+        type: string
+      uploaded_at:
+        example: "2020-12-10T15:15:45+03:00"
+        type: string
+    type: object
+  model.User:
+    properties:
+      login:
+        description: логин
+        type: string
+      password:
+        description: пароль
+        type: string
+    type: object
+  model.Withdraw:
+    properties:
+      order:
+        example: "2377225624"
+        type: string
+      processed_at:
+        example: "2020-12-09T16:09:57+03:00"
+        type: string
+      sum:
+        example: 751
+        type: number
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server GopherMart server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: GopherMart API
+  version: "1.0"
+paths:
+  /user/balance/withdraw:
+    get:
+      consumes:
+        - application/json
+      description: получение текущего баланса пользователя
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: успешная обработка запроса
+          schema:
+            $ref: '#/definitions/model.Balance'
+        "401":
+          description: пользователь не аутентифицирован
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+        - BearerAuth: [ ]
+      summary: баланс
+      tags:
+        - Account
+    post:
+      consumes:
+        - application/json
+      description: запрос на списание средств
+      parameters:
+        - description: Формат запроса JSON (body)
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: '#/definitions/model.Withdraw'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: успешная обработка запроса
+          schema:
+            $ref: '#/definitions/model.Withdraw'
+        "401":
+          description: пользователь не аутентифицирован
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "402":
+          description: на счету недостаточно средств
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "422":
+          description: неверный номер заказа
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+        - BearerAuth: [ ]
+      summary: списание
+      tags:
+        - Account
+  /user/login:
+    post:
+      consumes:
+        - application/json
+      description: аутентификация пользователя
+      parameters:
+        - description: Формат запроса JSON (body)
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: '#/definitions/model.User'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: пользователь успешно аутентифицирован
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: неверный формат запроса
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "401":
+          description: неверная пара логин/пароль
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+        - none: [ ]
+      summary: аутентификация
+      tags:
+        - Auth
+  /user/orders:
+    get:
+      consumes:
+        - application/json
+      description: список загруженных номеров заказов
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: успешная обработка запроса
+          schema:
+            items:
+              $ref: '#/definitions/model.Order'
+            type: array
+        "401":
+          description: пользователь не аутентифицирован
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+        - BearerAuth: [ ]
+      summary: заказы
+      tags:
+        - Orders
+    post:
+      consumes:
+        - text/plain
+      description: загрузка номера заказа
+      parameters:
+        - description: Формат запроса номер (body)
+          in: body
+          name: request
+          required: true
+          schema:
+            type: string
+      produces:
+        - text/plain
+      responses:
+        "200":
+          description: номер заказа уже был загружен этим пользователем
+          schema:
+            type: string
+        "202":
+          description: новый номер заказа принят в обработку
+          schema:
+            type: string
+        "400":
+          description: неверный формат запроса
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "401":
+          description: пользователь не аутентифицирован
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "409":
+          description: номер заказа уже был загружен другим пользователем
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "422":
+          description: неверный формат номера заказа
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+        - BearerAuth: [ ]
+      summary: заказ
+      tags:
+        - Orders
+  /user/register:
+    post:
+      consumes:
+        - application/json
+      description: регистрация пользователя
+      parameters:
+        - description: Формат запроса JSON (body)
+          in: body
+          name: request
+          required: true
+          schema:
+            $ref: '#/definitions/model.User'
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: пользователь успешно зарегистрирован и аутентифицирован
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: неверный формат запроса
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "409":
+          description: логин уже занят
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: регистрация
+      tags:
+        - Auth
+security:
+  - BearerAuth: [ ]
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

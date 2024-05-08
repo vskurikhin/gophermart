@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 19:13 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 18:50 by Victor N. Skurikhin.
  * main.go
  * $Id$
  */
@@ -14,6 +14,8 @@ import (
 	"github.com/go-chi/render"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"
+	httpSwagger "github.com/swaggo/http-swagger"
+	_ "github.com/vskurikhin/gophermart/docs"
 	"github.com/vskurikhin/gophermart/internal/env"
 	"github.com/vskurikhin/gophermart/internal/handlers/accounts"
 	"github.com/vskurikhin/gophermart/internal/handlers/auth"
@@ -28,6 +30,25 @@ import (
 
 //go:embed migrations/*.sql
 var embedMigrations embed.FS //
+
+//	@title			GopherMart API
+//	@version		1.0
+//	@description	This is a sample server GopherMart server.
+//	@termsOfService	http://swagger.io/terms/
+
+//	@contact.name	API Support
+//	@contact.url	http://www.swagger.io/support
+//	@contact.email	support@swagger.io
+
+//	@license.name	Apache 2.0
+//	@license.url	http://www.apache.org/licenses/LICENSE-2.0.html
+
+//	@host		localhost:8080
+//	@BasePath	/api
+
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
 
 func main() {
 
@@ -72,10 +93,15 @@ func routerSetup() *chi.Mux {
 	router.Use(render.SetContentType(render.ContentTypeJSON))
 
 	router.Group(func(r chi.Router) {
+		r.Use(middleware.Compress(9))
 		r.Post("/api/user/login", auth.UserLoginHandlerFunc())
 		r.Post("/api/user/register", auth.UserRegisterHandlerFunc())
+		r.Get("/swagger/*", httpSwagger.Handler(
+			httpSwagger.URL("/swagger/doc.json"), //The url pointing to API definition
+		))
 	})
 
+	//	@Security	BearerAuth
 	router.Group(func(r chi.Router) {
 		r.Use(utils.Verifier())
 		r.Use(utils.UnauthenticatedError)
@@ -85,6 +111,7 @@ func routerSetup() *chi.Mux {
 	router.Group(func(r chi.Router) {
 		r.Use(utils.Verifier())
 		r.Use(utils.UnauthorizedError)
+		r.Use(middleware.Compress(6))
 		r.Get("/api/user/orders", orders.UserOrdersHandlerFunc())
 
 		r.Get("/api/user/balance", accounts.BalanceHandlerFunc())

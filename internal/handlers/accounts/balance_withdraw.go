@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-20 18:06 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 17:40 by Victor N. Skurikhin.
  * balance_withdraw.go
  * $Id$
  */
@@ -28,6 +28,22 @@ func newBalanceWithdraw() *balanceWithdraw {
 	return &balanceWithdraw{log: logger.Get()}
 }
 
+// Handle balanceWithdraw
+//
+//	@Summary		списание
+//	@Description	запрос на списание средств
+//	@Tags			Account
+//	@Accept			json
+//	@Produce		json
+//	@Security		BearerAuth
+//	@Param			request	body		model.Withdraw	true	"Формат запроса JSON (body)"
+//	@Success		200		{object}	model.Withdraw	"успешная обработка запроса"
+//	@Failure		401		{object}	model.JSONError	"пользователь не аутентифицирован"
+//	@Failure		402		{object}	model.JSONError	"на счету недостаточно средств"
+//	@Failure		422		{object}	model.JSONError	"неверный номер заказа"
+//	@Failure		500		{string}	string			"Internal Server Error"
+//	@Router			/user/balance/withdraw [post]
+//
 //goland:noinspection GoUnhandledErrorResult
 func (r *balanceWithdraw) Handle(response http.ResponseWriter, request *http.Request) {
 

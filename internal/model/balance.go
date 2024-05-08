@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-04-19 17:02 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-07 17:40 by Victor N. Skurikhin.
  * balance.go
  * $Id$
  */
@@ -13,8 +13,8 @@ import (
 )
 
 type Balance struct {
-	Current   Float `json:"current"`
-	Withdrawn Float `json:"withdrawn"`
+	Current   Float `json:"current" example:"500.5"`
+	Withdrawn Float `json:"withdrawn" example:"42"`
 }
 
 func NewBalanceBigFloat(current big.Float, withdrawn big.Float) *Balance {
