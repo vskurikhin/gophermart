@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-05-07 17:19 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-13 15:37 by Victor N. Skurikhin.
  * orders.go
  * $Id$
  */
@@ -38,7 +38,7 @@ func newOrders() *orders {
 //	@Produce		json
 //	@Security		BearerAuth
 //	@Success		200				{array}		model.Order		"успешная обработка запроса"
-//	@Failure		401				{object}	model.JSONError	"пользователь не аутентифицирован"
+//	@Failure		401				{object}	model.JSONError	"пользователь не авторизован"
 //	@Failure		500				{string}	string			"Internal Server Error"
 //	@Router			/user/orders 	[get]
 //

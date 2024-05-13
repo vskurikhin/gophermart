@@ -66,7 +66,7 @@ info:
   title: GopherMart API
   version: "1.0"
 paths:
-  /user/balance/withdraw:
+  /user/balance:
     get:
       consumes:
         - application/json
@@ -79,7 +79,7 @@ paths:
           schema:
             $ref: '#/definitions/model.Balance'
         "401":
-          description: пользователь не аутентифицирован
+          description: пользователь не авторизован
           schema:
             $ref: '#/definitions/model.JSONError'
         "500":
@@ -91,6 +91,7 @@ paths:
       summary: баланс
       tags:
         - Account
+  /user/balance/withdraw:
     post:
       consumes:
         - application/json
@@ -110,7 +111,7 @@ paths:
           schema:
             $ref: '#/definitions/model.Withdraw'
         "401":
-          description: пользователь не аутентифицирован
+          description: пользователь не авторизован
           schema:
             $ref: '#/definitions/model.JSONError'
         "402":
@@ -181,7 +182,7 @@ paths:
               $ref: '#/definitions/model.Order'
             type: array
         "401":
-          description: пользователь не аутентифицирован
+          description: пользователь не авторизован
           schema:
             $ref: '#/definitions/model.JSONError'
         "500":
@@ -274,6 +275,37 @@ paths:
       summary: регистрация
       tags:
         - Auth
+  /user/withdrawals:
+    get:
+      consumes:
+        - application/json
+      description: получение информации о выводе средств
+      produces:
+        - application/json
+      responses:
+        "200":
+          description: успешная обработка запроса
+          schema:
+            items:
+              $ref: '#/definitions/model.Withdraw'
+            type: array
+        "204":
+          description: нет ни одного списания
+          schema:
+            $ref: '#/definitions/model.Empty'
+        "401":
+          description: пользователь не авторизован
+          schema:
+            $ref: '#/definitions/model.JSONError'
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+        - BearerAuth: [ ]
+      summary: информация о выводе средств
+      tags:
+        - Account
 security:
   - BearerAuth: [ ]
 securityDefinitions:

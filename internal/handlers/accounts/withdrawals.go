@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-05-07 17:39 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-13 15:47 by Victor N. Skurikhin.
  * withdrawals.go
  * $Id$
  */
@@ -38,9 +38,9 @@ func newWithdraws() *withdrawals {
 //	@Security		BearerAuth
 //	@Success		200				{array}		model.Withdraw	"успешная обработка запроса"
 //	@Success		204				{object}	model.Empty		"нет ни одного списания"
-//	@Failure		401				{object}	model.JSONError	"пользователь не аутентифицирован"
+//	@Failure		401				{object}	model.JSONError	"пользователь не авторизован"
 //	@Failure		500				{string}	string			"Internal Server Error"
-//	@Router			/user/orders 	[get]
+//	@Router			/user/withdrawals 	[get]
 //
 //goland:noinspection GoUnhandledErrorResult
 func (r *withdrawals) Handle(response http.ResponseWriter, request *http.Request) {

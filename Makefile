@@ -5,7 +5,8 @@ PROJECTNAME=$(shell basename "$(PWD)")
 # Go related variables.
 GOBASE=$(shell pwd)
 GOPATH="$(GOBASE)/vendor:$(GOBASE)"
-GOBIN=$(GOBASE)/cmd/gophermart
+CMD_GOPHERMART=cmd/gophermart
+GOBIN=$(GOBASE)/$(CMD_GOPHERMART)
 GOFILES=$(wildcard *.go)
 
 # Redirect error output to a file, so we can show it in development mode.
@@ -21,6 +22,9 @@ RND2=$(shell echo "("$RANDOM" % 1024) + 64514" | bc)
 ACCRUAL_PORT=$(RND2)
 ADDRESS=localhost:$(GOPHER_MART_PORT)
 TEMP_FILE=$(shell mktemp)
+DOCS_DIR=./docs
+DOCS_GO=$(DOCS_DIR)/docs.go
+MAIN_GO=./$(CMD_GOPHERMART)/main.go
 
 # Make is verbose in Linux. Make it silent.
 MAKEFLAGS += --silent
@@ -80,6 +84,11 @@ endif
 
 go-install:
 	@GOPATH=$(GOPATH) GOBIN=$(GOBIN) go install $(GOFILES)
+
+go-swag:
+	swag init -g $(MAIN_GO) --output $(DOCS_DIR)
+	sed -i 's/"localhost:8080",/env.GetConfig().Address(),/' $(DOCS_GO)
+	goimports -w $(DOCS_GO)
 
 go-clean:
 	@echo "  >  Cleaning build cache"

@@ -1,5 +1,5 @@
 /*
- * This file was last modified at 2024-05-07 18:33 by Victor N. Skurikhin.
+ * This file was last modified at 2024-05-13 16:44 by Victor N. Skurikhin.
  * docs.go
  * $Id$
  */
@@ -33,7 +33,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/user/balance/withdraw": {
+        "/user/balance": {
             "get": {
                 "security": [
                     {
@@ -59,7 +59,7 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "пользователь не аутентифицирован",
+                        "description": "пользователь не авторизован",
                         "schema": {
                             "$ref": "#/definitions/model.JSONError"
                         }
@@ -71,7 +71,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/user/balance/withdraw": {
             "post": {
                 "security": [
                     {
@@ -108,7 +110,7 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "пользователь не аутентифицирован",
+                        "description": "пользователь не авторизован",
                         "schema": {
                             "$ref": "#/definitions/model.JSONError"
                         }
@@ -220,7 +222,7 @@ const docTemplate = `{
                         }
                     },
                     "401": {
-                        "description": "пользователь не аутентифицирован",
+                        "description": "пользователь не авторизован",
                         "schema": {
                             "$ref": "#/definitions/model.JSONError"
                         }
@@ -346,6 +348,55 @@ const docTemplate = `{
                     },
                     "409": {
                         "description": "логин уже занят",
+                        "schema": {
+                            "$ref": "#/definitions/model.JSONError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/withdrawals": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "получение информации о выводе средств",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Account"
+                ],
+                "summary": "информация о выводе средств",
+                "responses": {
+                    "200": {
+                        "description": "успешная обработка запроса",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Withdraw"
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "нет ни одного списания",
+                        "schema": {
+                            "$ref": "#/definitions/model.Empty"
+                        }
+                    },
+                    "401": {
+                        "description": "пользователь не авторизован",
                         "schema": {
                             "$ref": "#/definitions/model.JSONError"
                         }
